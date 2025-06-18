@@ -1,0 +1,111 @@
+@startuml BHVES Detailed Class Diagram
+
+' Main BHVES Interface
+class BHVESInstance {
+  +startTimestamp: string | null
+  +data: {[key: string]: Data[]}
+  -dataIndexManager: DataIndexManager
+  +constructor(config: Config)
+  +addData(entries: AddDataEntry[], options?: AddDataOptions): Promise<Response<{name: string, itemCount: number}[]>>
+  -setupVideoPlayer(player: HTMLVideoElement, onStateUpdate?: (update: StateUpdate) => void, onTimeUpdate?: (update: TimeUpdate) => void): void
+  -findActiveEvents(currentMatchingIndexes: {[key: string]: number[]}, timestamp: string): {[key: string]: number[]}
+}
+
+' Configuration and Request Types
+class Config {
+  +videoPlayerId: string
+  +startTimestamp: string
+  +onTimeUpdate?: (update: TimeUpdate) => void
+  +onStateUpdate?: (update: StateUpdate) => void
+}
+
+class AddDataEntry {
+  +name: string
+  +dataJSONL: string
+}
+
+class AddDataOptions {
+  +onProgress?: (status: {status: 'loading' | 'error' | 'success', progress: number}) => void
+  +onSuccess?: (data: {[key: string]: Data[]}) => void
+  +onError?: (error: {message: string, details?: {successfulEntries?: {name: string, itemCount: number}[], failedEntries?: {name: string, message: string, details?: Record<string, unknown>}[]}}) => void
+  +sortData?: boolean
+}
+
+' Data Structures
+class Data {
+  +start_time: string
+  +end_time?: string
+  +type: string
+  +message?: string
+  +details?: object
+}
+
+class State {
+  +videoPlayerTime: number
+  +timestamp: string
+  +matchingIndexes: {[key: string]: number[]}
+  +activeMatchingIndexes: {[key: string]: number[]}
+}
+
+' Callback Types
+class TimeUpdate {
+  +videoPlayerTime: number
+  +timestamp: string
+}
+
+class StateUpdate {
+  +state: State
+  +data: {[key: string]: Data[]}
+}
+
+' Time Index Components
+class DataIndexManager {
+  -indexes: {[key: string]: DataIndex}
+  +addData(category: string, data: Data[], sortData?: boolean): Promise<void>
+  +findMatchingIndexes(timestamp: string): {[key: string]: number[]}
+  +clear(): void
+}
+
+interface DataIndex {
+  +startTimes: number[]
+  +endTimes: number[]
+  +indexes: number[]
+}
+
+' Response Types
+class Response<T> {
+  +status: 'success' | 'error'
+  +message: string
+  +data?: T
+  +details?: Record<string, unknown>
+  +timestamp: string
+}
+
+' Relationships
+BHVESInstance --> Config: uses
+BHVESInstance --> Data: manages
+BHVESInstance --> State: maintains
+BHVESInstance --> DataIndexManager: uses
+DataIndexManager --> DataIndex: manages
+DataIndexManager --> Data: indexes
+Config --> TimeUpdate: optional callback
+Config --> StateUpdate: optional callback
+AddDataEntry --> Data: contains
+
+' Notes
+note right of DataIndexManager
+  Optimizes timestamp-based lookups
+  using binary search
+end note
+
+note right of BHVESInstance
+  Main class for video
+  event synchronization
+end note
+
+note right of Data
+  Represents a single
+  event or log entry
+end note
+
+@enduml 

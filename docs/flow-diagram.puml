@@ -1,0 +1,115 @@
+@startuml BHVES Sequence Diagram
+
+actor User
+participant "Video Player" as Player
+participant "BHVESInstance" as BHVES
+participant "DataIndexManager" as IndexManager
+
+== Initialization ==
+User -> BHVES: new BHVESInstance(config)
+activate BHVES
+BHVES -> Player: Attach event listeners
+BHVES -> IndexManager: Initialize index manager
+BHVES --> User: Instance created
+deactivate BHVES
+
+== Data Management ==
+User -> BHVES: addData(entries, options)
+activate BHVES
+BHVES -> BHVES: Validate JSONL data
+BHVES -> BHVES: Parse data asynchronously in chunks
+BHVES -> IndexManager: Add data to index
+note right: Sorts data if sortData is true
+IndexManager --> BHVES: Index created
+BHVES -> User: onProgress(status)
+note right: Reports loading progress
+alt Success
+    BHVES -> User: onSuccess(data)
+    note right: Called when all data is processed
+else Error
+    BHVES -> User: onError(error)
+    note right: Called when processing fails
+end
+BHVES --> User: Promise<Response>
+deactivate BHVES
+
+== Time Updates ==
+Player -> BHVES: timeupdate event (videoPlayerTime)
+activate BHVES
+BHVES -> BHVES: Convert videoPlayerTime to ISO timestamp
+note right: Using startTimestamp + videoPlayerTime
+BHVES -> IndexManager: Find matching indexes
+note right: Uses binary search for efficient lookup
+IndexManager --> BHVES: Matching indexes
+BHVES -> BHVES: Find active events
+note right: Determines most recent active event
+BHVES -> User: onTimeUpdate({videoPlayerTime, timestamp})
+BHVES -> User: onStateUpdate({state, data})
+deactivate BHVES
+
+@enduml
+
+@startuml BHVES Class Diagram
+
+class BHVES {
+  +videoPlayerId: string | null
+  +startTimestamp: string | null
+  +data: {[key: string]: Data[]}
+  +init(config: Config): {status: string, message: string}
+  +addData(request: AddDataRequest): {status: string, message: string}
+  +getData(name?: string): Data[] | {[key: string]: Data[]}
+}
+
+class TimeIndexManager {
+  -indexes: {[key: string]: TimeIndex}
+  +addData(category: string, data: Data[]): void
+  +findMatchingIndexes(timestamp: string): {[key: string]: number[]}
+  +clear(): void
+}
+
+class TimeIndex {
+  +startTimes: number[]
+  +endTimes: number[]
+  +indexes: number[]
+}
+
+class Config {
+  +videoPlayerId: string
+  +startTimestamp: string
+  +onTimeUpdate?: (update: TimeUpdate) => void
+  +onStateUpdate?: (update: StateUpdate) => void
+}
+
+class Data {
+  +start_time: string
+  +end_time?: string
+  +type: string
+  +message?: string
+  +details?: object
+}
+
+class State {
+  +time: number
+  +timestamp: string
+  +matchingIndexes: {[key: string]: number[]}
+}
+
+class TimeUpdate {
+  +time: number
+  +timestamp: string
+}
+
+class StateUpdate {
+  +state: State
+  +data: {[key: string]: Data[]}
+}
+
+BHVES --> Config: uses
+BHVES --> Data: manages
+BHVES --> State: maintains
+BHVES --> TimeIndexManager: uses
+TimeIndexManager --> TimeIndex: manages
+Config --> TimeUpdate: optional callback
+Config --> StateUpdate: optional callback
+
+@enduml 

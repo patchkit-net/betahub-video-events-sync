@@ -1,0 +1,25 @@
+{"start_time": "2025-06-12T14:03:21", "type": "INFO", "message": "Server started", "details": {"port": 27015, "region": "NA-East"}}
+{"start_time": "2025-06-12T14:03:24", "type": "INFO", "message": "Map loaded", "details": {"map": "SkyFortress_Arena_v1"}}
+{"start_time": "2025-06-12T14:03:28", "type": "ERROR", "message": "Leaderboard service failed to load", "details": {"error_code": 503, "retrying": true}}
+{"start_time": "2025-06-12T14:03:32", "type": "CONNECT", "message": "Player connected", "details": {"player": "RoguePhoenix", "ip": "192.168.1.24"}}
+{"start_time": "2025-06-12T14:03:37", "type": "INFO", "message": "Player joined team", "details": {"player": "RoguePhoenix", "team": "RED"}}
+{"start_time": "2025-06-12T14:03:41", "type": "CONNECT", "message": "Player connected", "details": {"player": "Sn1perWolf", "ip": "10.0.0.52"}}
+{"start_time": "2025-06-12T14:03:44", "type": "INFO", "message": "Player joined team", "details": {"player": "Sn1perWolf", "team": "BLUE"}}
+{"start_time": "2025-06-12T14:03:47", "type": "ERROR", "message": "Voice chat server unresponsive", "details": {"timeout_ms": 1500, "affected_players": ["RoguePhoenix", "Sn1perWolf"]}}
+{"start_time": "2025-06-12T14:03:51", "type": "KILL", "message": "Player killed another player", "details": {"killer": "Sn1perWolf", "victim": "RoguePhoenix", "method": "Sniper Rifle", "bonus": "Headshot", "xp": 100}}
+{"start_time": "2025-06-12T14:03:55", "type": "OBJECTIVE", "message": "Control point capture started", "details": {"player": "Sn1perWolf", "point": "A"}}
+{"start_time": "2025-06-12T14:04:20", "type": "INFO", "message": "Player joined team", "details": {"player": "Sn1perWolf", "team": "BLUE"}}
+{"start_time": "2025-06-12T14:04:31", "type": "ERROR", "message": "Voice chat server unresponsive", "details": {"timeout_ms": 1500, "affected_players": ["RoguePhoenix", "Sn1perWolf"]}}
+{"start_time": "2025-06-12T14:05:17", "type": "KILL", "message": "Player killed another player", "details": {"killer": "Sn1perWolf", "victim": "RoguePhoenix", "method": "Sniper Rifle", "bonus": "Headshot", "xp": 100}}
+{"start_time": "2025-06-12T14:06:05", "type": "OBJECTIVE", "message": "Control point capture started", "details": {"player": "Sn1perWolf", "point": "A"}}
+{"start_time": "2025-06-12T14:06:25", "type": "OBJECTIVE", "message": "Control point captured", "details": {"team": "BLUE", "point": "A"}}
+{"start_time": "2025-06-12T14:06:27", "type": "INFO", "message": "Score updated", "details": {"RED": 0, "BLUE": 1}}
+{"start_time": "2025-06-12T14:07:10", "type": "DISCONNECT", "message": "Player disconnected", "details": {"player": "Sn1perWolf", "reason": "Ping Timeout"}}
+{"start_time": "2025-06-12T14:07:11", "type": "ERROR", "message": "Connection lost to matchmaking service", "details": {"service": "Matchmaker", "status": "offline"}}
+{"start_time": "2025-06-12T14:07:14", "type": "CONNECT", "message": "Player connected", "details": {"player": "SkyHunter", "ip": "172.16.2.9"}}
+{"start_time": "2025-06-12T14:08:00", "type": "INFO", "message": "Double XP event started", "details": {"event": "Double XP"}}
+{"start_time": "2025-06-12T14:08:22", "type": "KILL", "message": "Player killed another player", "details": {"killer": "SkyHunter", "victim": "RoguePhoenix", "method": "Rocket Launcher", "xp": 150, "bonus": "Double XP"}}
+{"start_time": "2025-06-12T14:10:00", "type": "INFO", "message": "Sudden death mode activated", "details": {"match_time_elapsed_minutes": 10}}
+{"start_time": "2025-06-12T14:11:28", "type": "OBJECTIVE", "message": "Control point captured", "details": {"team": "RED", "point": "B"}}
+{"start_time": "2025-06-12T14:12:00", "type": "INFO", "message": "Match ended in draw", "details": {}}
+{"start_time": "2025-06-12T14:12:20", "type": "INFO", "message": "Server entered idle mode", "details": {}}

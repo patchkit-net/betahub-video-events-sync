@@ -1,0 +1,38 @@
+{
+  "name": "betahub-video-events-sync",
+  "version": "1.0.0",
+  "type": "module",
+  "source": "src/bhves.ts",
+  "main": "dist/bhves.js",
+  "module": "dist/bhves.esm.js",
+  "types": "dist/bhves.d.ts",
+  "scripts": {
+    "build": "tsc && microbundle -f iife,es",
+    "watch": "microbundle watch -f iife,es",
+    "dev:example": "cd examples/react && yarn dev",
+    "dev": "concurrently \"yarn watch\" \"yarn dev:example\"",
+    "install:all": "yarn install && cd examples/react && yarn install",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": [
+    "betahub",
+    "video",
+    "sync",
+    "timeline",
+    "events"
+  ],
+  "author": "Upsoft sp. z o.o.",
+  "description": "BetaHub Video Events Sync - Synchronize time-based data with video player",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.11.30",
+    "concurrently": "^9.1.2",
+    "jest": "^30.0.0",
+    "microbundle": "^0.15.1",
+    "ts-jest": "^29.4.0",
+    "typescript": "^5.4.2"
+  }
+}
