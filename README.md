@@ -2,6 +2,18 @@
 
 A package for synchronizing time-based data with video players.
 
+## Install in external projects
+
+```bash
+npm install betahub-video-events-sync
+```
+
+or
+
+```bash
+yarn add betahub-video-events-sync
+```
+
 ## Usage
 
 ### Basic Setup
