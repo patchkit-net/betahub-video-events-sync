@@ -1,5 +1,4 @@
 import type { Data, DataInternal, Response, State, BHVESConstructorParams, OnStateUpdateCallback, OnTimeUpdateCallback } from './types';
-import { createErrorResponse, createSuccessResponse } from './errors';
 
 import { DataIndexManager } from './DataIndexManager';
 import { 
@@ -291,4 +290,3 @@ export * from './types';
 export * from './publicUtils/getMatchingData';
 export * from './publicUtils/getShiftedIndexes';
 export * from './publicUtils/getMovingWindowIndexes';
-export * from './errors';

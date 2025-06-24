@@ -1,5 +1,5 @@
 import type { Response } from '../types';
-import { createErrorResponse } from '../errors';
+import { createErrorResponse } from './errorHandler';
 
 export interface ProcessingError {
   name: string;

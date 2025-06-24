@@ -1,7 +1,7 @@
 import type { Data, Response } from '../types';
 
 import type { ProcessingResult } from './handleDataProcessingErrors';
-import { createSuccessResponse } from '../errors';
+import { createSuccessResponse } from './errorHandler';
 
 export interface SuccessHandlingOptions {
   onProgress?: (status: {

@@ -1,4 +1,4 @@
-import type { ErrorDetails, ErrorType } from '../types';
+import type { ErrorDetails, ErrorType, Response } from '../types';
 
 export interface ErrorContext {
   operation: string;
@@ -46,6 +46,42 @@ export function createStandardError(
   }
 
   return error;
+}
+
+/**
+ * Creates a standardized response object
+ */
+export function createResponse<T>(
+  status: 'success' | 'error',
+  message: string,
+  data?: T,
+  details?: Record<string, unknown>
+): Response<T> {
+  return {
+    status,
+    message,
+    data,
+    details,
+    timestamp: new Date().toISOString(),
+  };
+}
+
+/**
+ * Creates a success response
+ */
+export function createSuccessResponse<T>(data?: T, message: string = 'Operation completed successfully'): Response<T> {
+  return createResponse('success', message, data);
+}
+
+/**
+ * Creates an error response
+ */
+export function createErrorResponse<T>(
+  message: string,
+  details?: Record<string, unknown>,
+  data?: T
+): Response<T> {
+  return createResponse('error', message, data, details);
 }
 
 /**

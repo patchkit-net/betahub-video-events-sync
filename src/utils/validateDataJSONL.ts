@@ -1,5 +1,5 @@
 import type { Data, Response } from '../types';
-import { createErrorResponse, createSuccessResponse } from '../errors';
+import { createErrorResponse, createSuccessResponse } from './errorHandler';
 
 /**
  * Validates the format of JSONL data
