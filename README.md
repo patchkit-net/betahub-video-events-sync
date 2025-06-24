@@ -23,11 +23,11 @@ import { BHVESInstance } from 'betahub-video-events-sync';
 
 // Initialize the instance with a video player
 const bhves = new BHVESInstance({
-  videoPlayerId: 'my-video-player', // ID of your video element
+  videoPlayerDomId: 'my-video-player', // ID of your video element
   startTimestamp: '2025-06-12T14:03:20', // ISO timestamp when video starts
-  onTimeUpdate: ({ videoPlayerTime, timestamp }) => {
+  onTimeUpdate: ({ videoPlayerTimeSeconds, timestamp }) => {
     // Called on every video timeupdate event
-    console.log('Current video time:', videoPlayerTime);
+    console.log('Current video time:', videoPlayerTimeSeconds);
     console.log('Current ISO timestamp:', timestamp);
   },
   onStateUpdate: ({ state, data }) => {
@@ -45,11 +45,11 @@ const bhves = new BHVESInstance({
 await bhves.addData([
   { 
     name: 'logs', 
-    dataJSONL: '{"start_time":"2025-06-12T14:03:20","type":"log","message":"Event 1"}\n{"start_time":"2025-06-12T14:03:25","type":"log","message":"Event 2"}'
+    dataJSONL: '{"start_timestamp":"2025-06-12T14:03:20","type":"log","message":"Event 1"}\n{"start_timestamp":"2025-06-12T14:03:25","type":"log","message":"Event 2"}'
   },
   { 
     name: 'interactions', 
-    dataJSONL: '{"start_time":"2025-06-12T14:03:22","end_time":"2025-06-12T14:03:24","type":"interaction","message":"Click"}' 
+    dataJSONL: '{"start_timestamp":"2025-06-12T14:03:22","end_timestamp":"2025-06-12T14:03:24","type":"interaction","message":"Click"}' 
   }
 ], {
   // Optional: Sort data by start time
@@ -78,8 +78,8 @@ The library expects data in JSONL format (JSON Lines), where each line is a vali
 
 ```typescript
 interface Data {
-  start_time: string;    // ISO timestamp when the event starts
-  end_time?: string;     // Optional ISO timestamp when the event ends
+  start_timestamp: string;    // ISO timestamp when the event starts
+  end_timestamp?: string;     // Optional ISO timestamp when the event ends
   type: string;          // Event type (e.g., 'log', 'interaction')
   message?: string;      // Optional event message
   details?: object;      // Optional additional event details
@@ -93,7 +93,7 @@ The `onStateUpdate` callback provides two important pieces of information:
 1. `state`: Contains the current events state at the given video time
    ```typescript
    interface State {
-     videoPlayerTime: number;  // Current video time in seconds
+     videoPlayerTimeSeconds: number;  // Current video time in seconds
      timestamp: string;        // Current ISO timestamp
      matchingIndexes: {        // All events that should be displayed at current time
        [category: string]: number[]
@@ -105,8 +105,8 @@ The `onStateUpdate` callback provides two important pieces of information:
    ```
 
    The difference between `matchingIndexes` and `activeMatchingIndexes`:
-   - `matchingIndexes`: Contains all events that are currently active (within their time range). This is useful for events with `end_time` (like interactions or subtitles) that should be displayed for their entire duration.
-   - `activeMatchingIndexes`: Contains only the most recent event for each category. This is useful for events without `end_time` (like logs) where you want to show only the latest event.
+   - `matchingIndexes`: Contains all events that are currently active (within their time range). This is useful for events with `end_timestamp` (like interactions or subtitles) that should be displayed for their entire duration.
+   - `activeMatchingIndexes`: Contains only the most recent event for each category. This is useful for events without `end_timestamp` (like logs) where you want to show only the latest event.
 
 2. `data`: Contains all loaded data organized by category
    ```typescript

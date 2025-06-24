@@ -42,7 +42,8 @@ export const VideoPlayer = ({ id }: { id: string }) => {
         ref={videoRef}
         className="video-js"
       >
-        <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4" />
+        {/* <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4" /> */}
+        <source src="https://www.sample-videos.com/video321/mp4/720/big_buck_bunny_720p_10mb.mp4" type="video/mp4" />
         <p className="vjs-no-js">
           To view this video please enable JavaScript, and consider upgrading to
           a web browser that

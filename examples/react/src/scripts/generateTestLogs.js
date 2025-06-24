@@ -147,7 +147,7 @@ function generateLogs(startTime, endTime, numLogs) {
         
         // Generate log entry
         const logEntry = {
-            start_time: timestamp.toISOString(),
+            start_timestamp: timestamp.toISOString(),
             type: logType,
             message: message,
             details: generateDetails(logType, message)

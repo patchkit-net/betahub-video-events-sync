@@ -43,15 +43,16 @@ export const App = () => {
   useEffect(() => {
     // Initialize BHVES instance
     const bhves = new BHVESInstance({
-      videoPlayerId: 'player1',
+      videoPlayerDomId: 'player1',
       startTimestamp: '2025-06-12T14:03:20',
-      onTimeUpdate: ({ timestamp }) => {
+      onTimeUpdate: ({ videoPlayerTimeSeconds, timestamp }) => {
         setEventsTime(timestamp);
+        console.log('videoPlayerTimeSeconds', videoPlayerTimeSeconds);
       },
       onStateUpdate: ({ state, data }) => {
-        // for data with no end_timestamp (logs), so the moving window works
+        // for data with no end_timestampstamp (logs), so the moving window works
         const diffEventData = getMatchingData(state.activeMatchingIndexes, data);
-        // for data with end_timestamp (interactions, subtitles), so the data shows up and disappears in the correct time
+        // for data with end_timestampstamp (interactions, subtitles), so the data shows up and disappears in the correct time
         const eventData = getMatchingData(state.matchingIndexes, data);
 
         const { prepend, append } = getMovingWindowIndexes(
@@ -142,7 +143,7 @@ export const App = () => {
         <VideoPlayer id="player1" />
         <div>
           <span>
-            Events Time:{' '}
+            System Time:{' '}
             {eventsTime ? formatDate(eventsTime) : ''}
           </span>
         </div>

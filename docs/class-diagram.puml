@@ -13,7 +13,7 @@ class BHVESInstance {
 
 ' Configuration and Request Types
 class Config {
-  +videoPlayerId: string
+  +videoPlayerDomId: string
   +startTimestamp: string
   +onTimeUpdate?: (update: TimeUpdate) => void
   +onStateUpdate?: (update: StateUpdate) => void
@@ -33,15 +33,15 @@ class AddDataOptions {
 
 ' Data Structures
 class Data {
-  +start_time: string
-  +end_time?: string
+  +start_timestamp: string
+  +end_timestamp?: string
   +type: string
   +message?: string
   +details?: object
 }
 
 class State {
-  +videoPlayerTime: number
+  +videoPlayerTimeSeconds: number
   +timestamp: string
   +matchingIndexes: {[key: string]: number[]}
   +activeMatchingIndexes: {[key: string]: number[]}
@@ -49,7 +49,7 @@ class State {
 
 ' Callback Types
 class TimeUpdate {
-  +videoPlayerTime: number
+  +videoPlayerTimeSeconds: number
   +timestamp: string
 }
 
@@ -83,14 +83,16 @@ class Response<T> {
 
 ' Relationships
 BHVESInstance --> Config: uses
-BHVESInstance --> Data: manages
-BHVESInstance --> State: maintains
-BHVESInstance --> DataIndexManager: uses
-DataIndexManager --> DataIndex: manages
+BHVESInstance --> Data: contains
+BHVESInstance --> State: uses
+BHVESInstance --> DataIndexManager: contains
+BHVESInstance --> AddDataOptions: uses
+DataIndexManager --> DataIndex: contains
 DataIndexManager --> Data: indexes
 Config --> TimeUpdate: optional callback
 Config --> StateUpdate: optional callback
-AddDataEntry --> Data: contains
+AddDataEntry --> Data: references
+StateUpdate --> State: contains
 
 ' Notes
 note right of DataIndexManager

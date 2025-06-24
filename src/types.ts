@@ -38,15 +38,15 @@ export interface Response<T = void> {
 }
 
 export interface Data {
-  start_time: string;
-  end_time?: string;
+  start_timestamp: string;
+  end_timestamp?: string;
   type: string;
   message?: string;
   details?: object;
 }
 
 export interface State {
-  videoPlayerTime: number;
+  videoPlayerTimeSeconds: number;
   timestamp: string;
   matchingIndexes: { [key: string]: number[] };
   activeMatchingIndexes: { [key: string]: number[] };

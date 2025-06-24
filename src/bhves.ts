@@ -15,12 +15,12 @@ export class BHVESInstance {
   private dataIndexManager: DataIndexManager = new DataIndexManager();
 
   constructor({
-    videoPlayerId,
+    videoPlayerDomId,
     startTimestamp,
     onStateUpdate,
     onTimeUpdate,
   }: {
-    videoPlayerId: string;
+    videoPlayerDomId: string;
     startTimestamp: string;
     onStateUpdate?: ({
       state,
@@ -29,21 +29,21 @@ export class BHVESInstance {
       state: State;
       data: { [key: string]: Data[] };
     }) => void;
-    onTimeUpdate?: ({ videoPlayerTime, timestamp }: { videoPlayerTime: number; timestamp: string }) => void;
+    onTimeUpdate?: ({ videoPlayerTimeSeconds, timestamp }: { videoPlayerTimeSeconds: number; timestamp: string }) => void;
   }) {
-    if (!videoPlayerId) {
-      throw new Error('videoPlayerId is required');
+    if (!videoPlayerDomId) {
+      throw new Error('videoPlayerDomId is required');
     }
     if (!startTimestamp) {
       throw new Error('startTimestamp is required');
     }
 
     this.startTimestamp = startTimestamp;
-    const player = document.getElementById(videoPlayerId);
+    const player = document.getElementById(videoPlayerDomId);
 
     if (!(player instanceof HTMLVideoElement)) {
       throw new Error(
-        `Element with id ${videoPlayerId} is not a video element`
+        `Element with id ${videoPlayerDomId} is not a video element`
       );
     }
 
@@ -56,7 +56,7 @@ export class BHVESInstance {
   private setupVideoPlayer(
     player: HTMLVideoElement,
     onStateUpdate?: ({ state, data }: { state: State; data: { [key: string]: Data[] } }) => void,
-    onTimeUpdate?: ({ videoPlayerTime, timestamp }: { videoPlayerTime: number; timestamp: string }) => void
+    onTimeUpdate?: ({ videoPlayerTimeSeconds, timestamp }: { videoPlayerTimeSeconds: number; timestamp: string }) => void
   ): void {
     player.addEventListener('timeupdate', () => {
       const timestamp = convertVideoTimeToISOTimestamp(
@@ -71,7 +71,7 @@ export class BHVESInstance {
       const activeMatchingIndexes = this.findActiveEvents(currentMatchingIndexes, timestamp);
 
       const state: State = {
-        videoPlayerTime: player.currentTime,
+        videoPlayerTimeSeconds: player.currentTime,
         timestamp,
         matchingIndexes: currentMatchingIndexes,
         activeMatchingIndexes,
@@ -81,7 +81,7 @@ export class BHVESInstance {
         onStateUpdate?.({ state, data: this.data });
       }
 
-      onTimeUpdate?.({ videoPlayerTime: player.currentTime, timestamp });
+      onTimeUpdate?.({ videoPlayerTimeSeconds: player.currentTime, timestamp });
     });
   }
 
@@ -101,11 +101,11 @@ export class BHVESInstance {
 
       indexes.forEach(index => {
         const item = this.data[category][index];
-        const itemStartTime = new Date(item.start_time).getTime();
+        const itemStartTime = new Date(item.start_timestamp).getTime();
         
-        if (item.end_time) {
+        if (item.end_timestamp) {
           // For events with end time, check if current time is within the range
-          const itemEndTime = new Date(item.end_time).getTime();
+          const itemEndTime = new Date(item.end_timestamp).getTime();
           if (currentTime >= itemStartTime && currentTime <= itemEndTime && itemStartTime > mostRecentTime) {
             mostRecentIndex = index;
             mostRecentTime = itemStartTime;

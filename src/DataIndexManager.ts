@@ -23,8 +23,8 @@ export class DataIndexManager {
       
       // Process chunk
       chunk.forEach((item, index) => {
-        const startTime = new Date(item.start_time).getTime();
-        const endTime = item.end_time ? new Date(item.end_time).getTime() : Infinity;
+        const startTime = new Date(item.start_timestamp).getTime();
+        const endTime = item.end_timestamp ? new Date(item.end_timestamp).getTime() : Infinity;
         
         dataIndex.startTimes.push(startTime);
         dataIndex.endTimes.push(endTime);

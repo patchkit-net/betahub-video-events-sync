@@ -88,8 +88,8 @@ export const DataDisplay = ({
             whiteSpace: 'nowrap',
             marginLeft: '8px'
           }}>
-            {formatDate(item.start_time)}
-            {item.end_time && ` - ${formatDate(item.end_time)}`}
+            {formatDate(item.start_timestamp)}
+            {item.end_timestamp && ` - ${formatDate(item.end_timestamp)}`}
           </div>
         </div>
         {item.details && Object.keys(item.details).length > 0 && (

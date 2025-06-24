@@ -22,8 +22,8 @@ export const generateTestData = (options: TestDataOptions) => {
     return Array.from({ length: itemsPerCategory }, (_, i) => {
       const timestamp = startTime + (categoryIndex * itemsPerCategory + i) * timeStep;
       return {
-        start_time: new Date(timestamp).toISOString(),
-        end_time: new Date(timestamp + timeStep).toISOString(),
+        start_timestamp: new Date(timestamp).toISOString(),
+        end_timestamp: new Date(timestamp + timeStep).toISOString(),
         type: `test-${categoryIndex}`,
         data: { value: i }
       };
@@ -44,7 +44,7 @@ export const generateTestData = (options: TestDataOptions) => {
       const targetTime = new Date(timestamp).getTime();
       Object.entries(data).forEach(([category, items]) => {
         const indexes = items
-          .map((item, index) => ({ index, time: new Date(item.start_time).getTime() }))
+          .map((item, index) => ({ index, time: new Date(item.start_timestamp).getTime() }))
           .filter(item => item.time <= targetTime)
           .map(item => item.index);
         if (indexes.length > 0) {
@@ -60,8 +60,8 @@ export const generateTestData = (options: TestDataOptions) => {
 export const generateTimeIndexData = (size: number) => {
   const now = Date.now();
   return Array.from({ length: size }, (_, i) => ({
-    start_time: new Date(now + i * 1000).toISOString(),
-    end_time: new Date(now + (i + 1) * 1000).toISOString(),
+    start_timestamp: new Date(now + i * 1000).toISOString(),
+    end_timestamp: new Date(now + (i + 1) * 1000).toISOString(),
     type: 'test',
     data: { value: i }
   }));

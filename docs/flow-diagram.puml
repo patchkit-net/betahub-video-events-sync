@@ -34,16 +34,16 @@ BHVES --> User: Promise<Response>
 deactivate BHVES
 
 == Time Updates ==
-Player -> BHVES: timeupdate event (videoPlayerTime)
+Player -> BHVES: timeupdate event (videoPlayerTimeSeconds)
 activate BHVES
-BHVES -> BHVES: Convert videoPlayerTime to ISO timestamp
-note right: Using startTimestamp + videoPlayerTime
+BHVES -> BHVES: Convert videoPlayerTimeSeconds to ISO timestamp
+note right: Using startTimestamp + videoPlayerTimeSeconds
 BHVES -> IndexManager: Find matching indexes
 note right: Uses binary search for efficient lookup
 IndexManager --> BHVES: Matching indexes
 BHVES -> BHVES: Find active events
 note right: Determines most recent active event
-BHVES -> User: onTimeUpdate({videoPlayerTime, timestamp})
+BHVES -> User: onTimeUpdate({videoPlayerTimeSeconds, timestamp})
 BHVES -> User: onStateUpdate({state, data})
 deactivate BHVES
 
@@ -52,7 +52,7 @@ deactivate BHVES
 @startuml BHVES Class Diagram
 
 class BHVES {
-  +videoPlayerId: string | null
+  +videoPlayerDomId: string | null
   +startTimestamp: string | null
   +data: {[key: string]: Data[]}
   +init(config: Config): {status: string, message: string}
@@ -74,15 +74,15 @@ class TimeIndex {
 }
 
 class Config {
-  +videoPlayerId: string
+  +videoPlayerDomId: string
   +startTimestamp: string
   +onTimeUpdate?: (update: TimeUpdate) => void
   +onStateUpdate?: (update: StateUpdate) => void
 }
 
 class Data {
-  +start_time: string
-  +end_time?: string
+  +start_timestamp: string
+  +end_timestamp?: string
   +type: string
   +message?: string
   +details?: object

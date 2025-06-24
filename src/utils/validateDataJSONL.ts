@@ -22,13 +22,13 @@ export function validateDataJSONL(dataJSONL: string): Response & { success: bool
       }), success: false };
     }
 
-    if (!item.start_time || typeof item.start_time !== 'string') {
+    if (!item.start_timestamp || typeof item.start_timestamp !== 'string') {
       return { ...createErrorResponse(
-        `Item ${index} is missing or has invalid start_time`,
+        `Item ${index} is missing or has invalid start_timestamp`,
         {
           itemIndex: index,
-          field: 'start_time',
-          value: item.start_time,
+          field: 'start_timestamp',
+          value: item.start_timestamp,
         }
       ), success: false };
     }
@@ -42,13 +42,13 @@ export function validateDataJSONL(dataJSONL: string): Response & { success: bool
         }
       ), success: false };
     }
-    if (item.end_time !== undefined && typeof item.end_time !== 'string') {
+    if (item.end_timestamp !== undefined && typeof item.end_timestamp !== 'string') {
       return { ...createErrorResponse(
-        `Item ${index} has invalid end_time (must be string if present)`,
+        `Item ${index} has invalid end_timestamp (must be string if present)`,
         {
           itemIndex: index,
-          field: 'end_time',
-          value: item.end_time,
+          field: 'end_timestamp',
+          value: item.end_timestamp,
         }
       ), success: false };
     }
