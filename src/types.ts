@@ -1,12 +1,21 @@
-export enum Status {
-  SUCCESS = 'success',
-  ERROR = 'error',
-}
-
 export type ErrorType = 'ValidationError' | 'DataProcessingError' | 'ConfigurationError' | 'UnknownError';
 
 export interface ErrorDetails {
   [key: string]: unknown;
+}
+
+export interface ErrorContext {
+  operation: string;
+  component: string;
+  timestamp: string;
+  additionalInfo?: Record<string, unknown>;
+}
+
+export interface ErrorInfo {
+  type: ErrorType;
+  message: string;
+  context?: ErrorContext;
+  originalError?: Error;
 }
 
 export interface BHVLError {

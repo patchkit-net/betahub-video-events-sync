@@ -1,18 +1,4 @@
-import type { ErrorDetails, ErrorType, Response } from '../types';
-
-export interface ErrorContext {
-  operation: string;
-  component: string;
-  timestamp: string;
-  additionalInfo?: Record<string, unknown>;
-}
-
-export interface ErrorInfo {
-  type: ErrorType;
-  message: string;
-  context?: ErrorContext;
-  originalError?: Error;
-}
+import type { ErrorContext, ErrorDetails, ErrorInfo, ErrorType, Response } from '../types';
 
 /**
  * Creates a standardized error with proper context and logging

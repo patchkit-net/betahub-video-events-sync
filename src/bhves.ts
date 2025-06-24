@@ -1,22 +1,30 @@
-import type { Data, DataInternal, Response, State, BHVESConstructorParams, OnStateUpdateCallback, OnTimeUpdateCallback } from './types';
+import type {
+  BHVESConstructorParams,
+  Data,
+  DataInternal,
+  OnStateUpdateCallback,
+  OnTimeUpdateCallback,
+  Response,
+  State,
+} from './types';
 
 import { DataIndexManager } from './DataIndexManager';
-import { 
-  convertVideoTimeToISOTimestamp,
+import {
   convertToInternalData,
-  findActiveEvents,
-  processDataEntry,
-  type ProcessDataEntryOptions,
+  convertVideoTimeToISOTimestamp,
   countTotalItems,
-  validateTimestamp,
-  validateVideoPlayer,
+  createStandardError,
+  findActiveEvents,
   handleDataProcessingErrors,
   handleDataProcessingSuccess,
+  processDataEntry,
   validateRequired,
   validateString,
-  createStandardError,
+  validateTimestamp,
+  validateVideoPlayer,
+  type ProcessDataEntryOptions,
   type ProcessingError,
-  type ProcessingResult
+  type ProcessingResult,
 } from './utils';
 
 /**
@@ -43,12 +51,13 @@ export class BHVESInstance {
     // Validate required parameters
     validateRequired(videoPlayerDomId, 'videoPlayerDomId', context);
     validateRequired(startTimestamp, 'startTimestamp', context);
+
     validateString(videoPlayerDomId, 'videoPlayerDomId', context);
     validateString(startTimestamp, 'startTimestamp', context);
 
     this.startTimestamp = startTimestamp;
     this.startTimestampParsed = validateTimestamp(startTimestamp);
-    
+
     const player = validateVideoPlayer(videoPlayerDomId);
     this.videoPlayer = player;
     this.setupVideoPlayer(player, onStateUpdate, onTimeUpdate);
@@ -65,7 +74,7 @@ export class BHVESInstance {
     this.timeUpdateHandler = () => {
       this.handleTimeUpdate(player, onStateUpdate, onTimeUpdate);
     };
-    
+
     player.addEventListener('timeupdate', this.timeUpdateHandler);
   }
 
@@ -77,7 +86,10 @@ export class BHVESInstance {
     onStateUpdate?: OnStateUpdateCallback,
     onTimeUpdate?: OnTimeUpdateCallback
   ): void {
-    const context = { operation: 'handleTimeUpdate', component: 'BHVESInstance' };
+    const context = {
+      operation: 'handleTimeUpdate',
+      component: 'BHVESInstance',
+    };
 
     if (!this.startTimestampParsed) {
       throw createStandardError({
@@ -92,15 +104,24 @@ export class BHVESInstance {
 
     const videoPlayerTimeSeconds = player.currentTime;
     const videoPlayerTimeMilliseconds = videoPlayerTimeSeconds * 1000;
-    const timestamp = convertVideoTimeToISOTimestamp(this.startTimestampParsed, videoPlayerTimeSeconds);
-    const currentTime = this.startTimestampParsed.getTime() + videoPlayerTimeMilliseconds;
+    const timestamp = convertVideoTimeToISOTimestamp(
+      this.startTimestampParsed,
+      videoPlayerTimeSeconds
+    );
+    const currentTime =
+      this.startTimestampParsed.getTime() + videoPlayerTimeMilliseconds;
     const currentTimeDate = new Date(currentTime);
-    
+
     // Get all events that should be displayed at current time
-    const matchingIndexes = this.dataIndexManager.findMatchingIndexes(currentTimeDate);
-    
+    const matchingIndexes =
+      this.dataIndexManager.findMatchingIndexes(currentTimeDate);
+
     // Find the most recent event that should be active at current time
-    const activeMatchingIndexes = findActiveEvents(matchingIndexes, this.dataInternal, currentTime);
+    const activeMatchingIndexes = findActiveEvents(
+      matchingIndexes,
+      this.dataInternal,
+      currentTime
+    );
 
     const state: State = {
       videoPlayerTimeSeconds: player.currentTime,
@@ -142,10 +163,16 @@ export class BHVESInstance {
     }
   ): Promise<Response<{ name: string; itemCount: number }[]>> {
     const totalItems = countTotalItems(entries);
-    const { results, errors } = await this.processDataEntries(entries, totalItems, options);
+    const { results, errors } = await this.processDataEntries(
+      entries,
+      totalItems,
+      options
+    );
 
     if (errors.length > 0) {
-      return handleDataProcessingErrors(results, errors, { onError: options?.onError });
+      return handleDataProcessingErrors(results, errors, {
+        onError: options?.onError,
+      });
     }
 
     return handleDataProcessingSuccess(results, this.data, {
@@ -186,7 +213,11 @@ export class BHVESInstance {
       totalProgress = processOptions.totalProgress;
 
       if (result.success && result.data) {
-        await this.storeProcessedData(name, result.data, options?.sortData ?? true);
+        await this.storeProcessedData(
+          name,
+          result.data,
+          options?.sortData ?? true
+        );
 
         if (result.itemCount === undefined) {
           throw createStandardError({
@@ -220,30 +251,44 @@ export class BHVESInstance {
   /**
    * Stores processed data in both original and internal formats and indexes it
    */
-  private async storeProcessedData(name: string, data: Data[], sortData: boolean): Promise<void> {
-    const context = { operation: 'storeProcessedData', component: 'BHVESInstance' };
+  private async storeProcessedData(
+    name: string,
+    data: Data[],
+    sortData: boolean
+  ): Promise<void> {
+    const context = {
+      operation: 'storeProcessedData',
+      component: 'BHVESInstance',
+    };
 
     try {
       // Store original data
       this.data[name] = data;
-      
+
       // Convert to internal format with parsed timestamps
       const internalData = convertToInternalData(data);
       this.dataInternal[name] = internalData;
-      
+
       // Add to index manager
       await this.dataIndexManager.addData(name, internalData, sortData);
     } catch (error) {
       throw createStandardError({
         type: 'DataProcessingError',
-        message: `Failed to store data for entry "${name}": ${error instanceof Error ? error.message : String(error)}`,
+        message: `Failed to store data for entry "${name}": ${
+          error instanceof Error ? error.message : String(error)
+        }`,
         context: {
           operation: 'storeProcessedData',
           component: 'BHVESInstance',
           timestamp: new Date().toISOString(),
-          additionalInfo: { entryName: name, dataLength: data.length, sortData },
+          additionalInfo: {
+            entryName: name,
+            dataLength: data.length,
+            sortData,
+          },
         },
-        originalError: error instanceof Error ? error : new Error(String(error)),
+        originalError:
+          error instanceof Error ? error : new Error(String(error)),
       });
     }
   }
@@ -253,7 +298,10 @@ export class BHVESInstance {
    */
   destroy(): void {
     if (this.videoPlayer && this.timeUpdateHandler) {
-      this.videoPlayer.removeEventListener('timeupdate', this.timeUpdateHandler);
+      this.videoPlayer.removeEventListener(
+        'timeupdate',
+        this.timeUpdateHandler
+      );
       this.videoPlayer = null;
       this.timeUpdateHandler = null;
     }
@@ -270,12 +318,21 @@ export class BHVESInstance {
 
     const videoPlayerTimeSeconds = this.videoPlayer.currentTime;
     const videoPlayerTimeMilliseconds = videoPlayerTimeSeconds * 1000;
-    const timestamp = convertVideoTimeToISOTimestamp(this.startTimestampParsed, videoPlayerTimeSeconds);
-    const currentTime = this.startTimestampParsed.getTime() + videoPlayerTimeMilliseconds;
+    const timestamp = convertVideoTimeToISOTimestamp(
+      this.startTimestampParsed,
+      videoPlayerTimeSeconds
+    );
+    const currentTime =
+      this.startTimestampParsed.getTime() + videoPlayerTimeMilliseconds;
     const currentTimeDate = new Date(currentTime);
-    
-    const matchingIndexes = this.dataIndexManager.findMatchingIndexes(currentTimeDate);
-    const activeMatchingIndexes = findActiveEvents(matchingIndexes, this.dataInternal, currentTime);
+
+    const matchingIndexes =
+      this.dataIndexManager.findMatchingIndexes(currentTimeDate);
+    const activeMatchingIndexes = findActiveEvents(
+      matchingIndexes,
+      this.dataInternal,
+      currentTime
+    );
 
     return {
       videoPlayerTimeSeconds,
@@ -286,7 +343,8 @@ export class BHVESInstance {
   }
 }
 
-export * from './types';
 export * from './publicUtils/getMatchingData';
-export * from './publicUtils/getShiftedIndexes';
 export * from './publicUtils/getMovingWindowIndexes';
+export * from './publicUtils/getShiftedIndexes';
+export * from './types';
+
