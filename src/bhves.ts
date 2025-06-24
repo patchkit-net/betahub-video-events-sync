@@ -55,29 +55,39 @@ export class BHVESInstance {
     this.startTimestampParsed = parseTimestamp(startTimestamp);
 
     this.videoPlayer = findVideoPlayer(videoPlayerDomId);
-    this.setupVideoPlayer(this.videoPlayer, onStateUpdate, onTimeUpdate);
+    this.setupVideoPlayer(onStateUpdate, onTimeUpdate);
   }
 
   /**
    * Sets up the video player event listeners and state management
    */
   private setupVideoPlayer(
-    player: HTMLVideoElement,
     onStateUpdate?: OnStateUpdateCallback,
     onTimeUpdate?: OnTimeUpdateCallback
   ): void {
+    if (!this.videoPlayer) {
+      throw createStandardError({
+        type: 'ConfigurationError',
+        message: 'Video player is not initialized',
+        context: {
+          operation: 'setupVideoPlayer',
+          component: 'BHVESInstance',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+
     this.timeUpdateHandler = () => {
-      this.handleTimeUpdate(player, onStateUpdate, onTimeUpdate);
+      this.handleTimeUpdate(onStateUpdate, onTimeUpdate);
     };
 
-    player.addEventListener('timeupdate', this.timeUpdateHandler);
+    this.videoPlayer.addEventListener('timeupdate', this.timeUpdateHandler);
   }
 
   /**
    * Handles video time updates and triggers appropriate callbacks
    */
   private handleTimeUpdate(
-    player: HTMLVideoElement,
     onStateUpdate?: OnStateUpdateCallback,
     onTimeUpdate?: OnTimeUpdateCallback
   ): void {
@@ -86,10 +96,10 @@ export class BHVESInstance {
       component: 'BHVESInstance',
     };
 
-    if (!this.startTimestampParsed) {
+    if (!this.startTimestampParsed || !this.videoPlayer) {
       throw createStandardError({
         type: 'ConfigurationError',
-        message: 'startTimestampParsed is not initialized',
+        message: 'startTimestampParsed or videoPlayer is not initialized',
         context: {
           ...context,
           timestamp: new Date().toISOString(),
@@ -97,7 +107,7 @@ export class BHVESInstance {
       });
     }
 
-    const videoPlayerTimeSeconds = player.currentTime;
+    const videoPlayerTimeSeconds = this.videoPlayer.currentTime;
     const videoPlayerTimeMilliseconds = videoPlayerTimeSeconds * 1000;
     const timestamp = convertVideoTimeToISOTimestamp(
       this.startTimestampParsed,
@@ -119,7 +129,7 @@ export class BHVESInstance {
     );
 
     const state: State = {
-      videoPlayerTimeSeconds: player.currentTime,
+      videoPlayerTimeSeconds: this.videoPlayer.currentTime,
       timestamp,
       matchingIndexes,
       activeMatchingIndexes,
@@ -129,7 +139,7 @@ export class BHVESInstance {
       onStateUpdate?.({ state, data: this.data });
     }
 
-    onTimeUpdate?.({ videoPlayerTimeSeconds: player.currentTime, timestamp });
+    onTimeUpdate?.({ videoPlayerTimeSeconds: this.videoPlayer.currentTime, timestamp });
   }
 
   /**
