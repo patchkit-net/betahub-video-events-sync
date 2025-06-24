@@ -106,13 +106,13 @@ export function withErrorHandling<T>(
 }
 
 /**
- * Validates required parameters and throws standardized errors
+ * Validates that a parameter is a required non-empty string and throws standardized errors
  */
-export function validateRequired<T>(
-  value: T | null | undefined,
+export function validateRequiredString(
+  value: unknown,
   name: string,
   context: Omit<ErrorContext, 'timestamp'>
-): T {
+): string {
   if (value === null || value === undefined) {
     throw createStandardError({
       type: 'ValidationError',
@@ -123,17 +123,7 @@ export function validateRequired<T>(
       },
     });
   }
-  return value;
-}
 
-/**
- * Validates string parameters and throws standardized errors
- */
-export function validateString(
-  value: unknown,
-  name: string,
-  context: Omit<ErrorContext, 'timestamp'>
-): string {
   if (typeof value !== 'string' || value.trim() === '') {
     throw createStandardError({
       type: 'ValidationError',
@@ -144,5 +134,6 @@ export function validateString(
       },
     });
   }
+
   return value;
 } 

@@ -10,8 +10,7 @@ export { handleDataProcessingErrors, type ProcessingError, type ProcessingResult
 export { handleDataProcessingSuccess, type SuccessHandlingOptions } from './handleDataProcessingSuccess';
 export { 
   createStandardError, 
-  validateRequired, 
-  validateString,
+  validateRequiredString,
   createResponse,
   createSuccessResponse,
   createErrorResponse

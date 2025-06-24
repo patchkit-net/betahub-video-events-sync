@@ -18,8 +18,7 @@ import {
   handleDataProcessingErrors,
   handleDataProcessingSuccess,
   processDataEntry,
-  validateRequired,
-  validateString,
+  validateRequiredString,
   validateTimestamp,
   validateVideoPlayer,
   type ProcessDataEntryOptions,
@@ -49,11 +48,8 @@ export class BHVESInstance {
     const context = { operation: 'initialize', component: 'BHVESInstance' };
 
     // Validate required parameters
-    validateRequired(videoPlayerDomId, 'videoPlayerDomId', context);
-    validateRequired(startTimestamp, 'startTimestamp', context);
-
-    validateString(videoPlayerDomId, 'videoPlayerDomId', context);
-    validateString(startTimestamp, 'startTimestamp', context);
+    validateRequiredString(videoPlayerDomId, 'videoPlayerDomId', context);
+    validateRequiredString(startTimestamp, 'startTimestamp', context);
 
     this.startTimestamp = startTimestamp;
     this.startTimestampParsed = validateTimestamp(startTimestamp);
