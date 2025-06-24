@@ -9,7 +9,8 @@ import {
   processDataEntry,
   type ProcessDataEntryOptions,
   countTotalItems,
-  validateTimestamp
+  validateTimestamp,
+  validateVideoPlayer
 } from './utils';
 
 /**
@@ -22,6 +23,8 @@ export class BHVESInstance {
   data: { [key: string]: Data[] } = {};
   private dataInternal: { [key: string]: DataInternal[] } = {};
   private dataIndexManager: DataIndexManager = new DataIndexManager();
+  private videoPlayer: HTMLVideoElement | null = null;
+  private timeUpdateHandler: ((event: Event) => void) | null = null;
 
   constructor({
     videoPlayerDomId,
@@ -39,14 +42,8 @@ export class BHVESInstance {
     this.startTimestamp = startTimestamp;
     this.startTimestampParsed = validateTimestamp(startTimestamp);
     
-    const player = document.getElementById(videoPlayerDomId);
-
-    if (!(player instanceof HTMLVideoElement)) {
-      throw new Error(
-        `Element with id ${videoPlayerDomId} is not a video element`
-      );
-    }
-
+    const player = validateVideoPlayer(videoPlayerDomId);
+    this.videoPlayer = player;
     this.setupVideoPlayer(player, onStateUpdate, onTimeUpdate);
   }
 
@@ -58,35 +55,48 @@ export class BHVESInstance {
     onStateUpdate?: OnStateUpdateCallback,
     onTimeUpdate?: OnTimeUpdateCallback
   ): void {
-    player.addEventListener('timeupdate', () => {
-      if (!this.startTimestampParsed) {
-        throw new Error('startTimestampParsed is not initialized');
-      }
+    this.timeUpdateHandler = () => {
+      this.handleTimeUpdate(player, onStateUpdate, onTimeUpdate);
+    };
+    
+    player.addEventListener('timeupdate', this.timeUpdateHandler);
+  }
 
-      const videoPlayerTimeSeconds = player.currentTime;
-      const videoPlayerTimeMilliseconds = videoPlayerTimeSeconds * 1000;
-      const timestamp = convertVideoTimeToISOTimestamp(this.startTimestampParsed, videoPlayerTimeMilliseconds);
-      const currentTime = this.startTimestampParsed.getTime() + videoPlayerTimeMilliseconds;
-      
-      // Get all events that should be displayed at current time
-      const matchingIndexes = this.dataIndexManager.findMatchingIndexes(timestamp);
-      
-      // Find the most recent event that should be active at current time
-      const activeMatchingIndexes = findActiveEvents(matchingIndexes, this.dataInternal, currentTime);
+  /**
+   * Handles video time updates and triggers appropriate callbacks
+   */
+  private handleTimeUpdate(
+    player: HTMLVideoElement,
+    onStateUpdate?: OnStateUpdateCallback,
+    onTimeUpdate?: OnTimeUpdateCallback
+  ): void {
+    if (!this.startTimestampParsed) {
+      throw new Error('startTimestampParsed is not initialized');
+    }
 
-      const state: State = {
-        videoPlayerTimeSeconds: player.currentTime,
-        timestamp,
-        matchingIndexes,
-        activeMatchingIndexes,
-      };
+    const videoPlayerTimeSeconds = player.currentTime;
+    const videoPlayerTimeMilliseconds = videoPlayerTimeSeconds * 1000;
+    const timestamp = convertVideoTimeToISOTimestamp(this.startTimestampParsed, videoPlayerTimeSeconds);
+    const currentTime = this.startTimestampParsed.getTime() + videoPlayerTimeMilliseconds;
+    
+    // Get all events that should be displayed at current time
+    const matchingIndexes = this.dataIndexManager.findMatchingIndexes(timestamp);
+    
+    // Find the most recent event that should be active at current time
+    const activeMatchingIndexes = findActiveEvents(matchingIndexes, this.dataInternal, currentTime);
 
-      if (Object.keys(state.matchingIndexes).length > 0) {
-        onStateUpdate?.({ state, data: this.data });
-      }
+    const state: State = {
+      videoPlayerTimeSeconds: player.currentTime,
+      timestamp,
+      matchingIndexes,
+      activeMatchingIndexes,
+    };
 
-      onTimeUpdate?.({ videoPlayerTimeSeconds: player.currentTime, timestamp });
-    });
+    if (Object.keys(state.matchingIndexes).length > 0) {
+      onStateUpdate?.({ state, data: this.data });
+    }
+
+    onTimeUpdate?.({ videoPlayerTimeSeconds: player.currentTime, timestamp });
   }
 
   /**
@@ -185,6 +195,42 @@ export class BHVESInstance {
     );
     options?.onSuccess?.(this.data);
     return successResponse;
+  }
+
+  /**
+   * Cleans up resources and removes event listeners
+   */
+  destroy(): void {
+    if (this.videoPlayer && this.timeUpdateHandler) {
+      this.videoPlayer.removeEventListener('timeupdate', this.timeUpdateHandler);
+      this.videoPlayer = null;
+      this.timeUpdateHandler = null;
+    }
+  }
+
+  /**
+   * Gets the current state without triggering callbacks
+   * @returns Current state or null if video player is not available
+   */
+  getCurrentState(): State | null {
+    if (!this.videoPlayer || !this.startTimestampParsed) {
+      return null;
+    }
+
+    const videoPlayerTimeSeconds = this.videoPlayer.currentTime;
+    const videoPlayerTimeMilliseconds = videoPlayerTimeSeconds * 1000;
+    const timestamp = convertVideoTimeToISOTimestamp(this.startTimestampParsed, videoPlayerTimeSeconds);
+    const currentTime = this.startTimestampParsed.getTime() + videoPlayerTimeMilliseconds;
+    
+    const matchingIndexes = this.dataIndexManager.findMatchingIndexes(timestamp);
+    const activeMatchingIndexes = findActiveEvents(matchingIndexes, this.dataInternal, currentTime);
+
+    return {
+      videoPlayerTimeSeconds,
+      timestamp,
+      matchingIndexes,
+      activeMatchingIndexes,
+    };
   }
 }
 

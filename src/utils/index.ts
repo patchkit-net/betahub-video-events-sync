@@ -5,3 +5,4 @@ export { processDataEntry, type ProcessDataEntryResult, type ProcessDataEntryOpt
 export { countTotalItems } from './countTotalItems';
 export { validateDataJSONL } from './validateDataJSONL';
 export { validateTimestamp } from './validateTimestamp';
+export { validateVideoPlayer } from './validateVideoPlayer';
