@@ -45,6 +45,15 @@ export interface Data {
   details?: object;
 }
 
+// Internal data structure with parsed timestamps for better performance
+export interface DataInternal {
+  start_timestamp: Date;
+  end_timestamp?: Date;
+  type: string;
+  message?: string;
+  details?: object;
+}
+
 export interface State {
   videoPlayerTimeSeconds: number;
   timestamp: string;

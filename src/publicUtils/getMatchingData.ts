@@ -1,4 +1,4 @@
-import type { Data } from '../types';
+import type { Data, DataInternal } from '../types';
 
 /**
  * Retrieves the data items corresponding to the given matching indexes for each category.
@@ -17,6 +17,23 @@ export const getMatchingData = (
   matchingIndexes: { [key: string]: number[] },
   data: { [key: string]: Data[] }
 ): { [key: string]: Data[] } => {
+  return Object.entries(matchingIndexes).reduce(
+    (acc, [category, indexes]) => ({
+      ...acc,
+      [category]: indexes.map(index => data[category][index])
+    }),
+    {}
+  );
+};
+
+/**
+ * Internal version that works with DataInternal for better performance.
+ * This function is used internally when we have parsed timestamps.
+ */
+export const getMatchingDataInternal = (
+  matchingIndexes: { [key: string]: number[] },
+  data: { [key: string]: DataInternal[] }
+): { [key: string]: DataInternal[] } => {
   return Object.entries(matchingIndexes).reduce(
     (acc, [category, indexes]) => ({
       ...acc,

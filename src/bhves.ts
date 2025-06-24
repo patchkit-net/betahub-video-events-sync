@@ -1,8 +1,8 @@
-import type { Data, Response, State } from './types';
+import type { Data, DataInternal, Response, State } from './types';
 import { createErrorResponse, createSuccessResponse } from './errors';
 
 import { DataIndexManager } from './DataIndexManager';
-import { convertVideoTimeToISOTimestamp } from './utils/convertVideoTimetoISOTimestamp';
+import { convertVideoTimeToISOTimestamp } from './utils/convertVideoTimeToISOTimestamp';
 import { validateDataJSONL } from './utils/validateDataJSONL';
 
 /**
@@ -11,7 +11,9 @@ import { validateDataJSONL } from './utils/validateDataJSONL';
  */
 export class BHVESInstance {
   startTimestamp: string | null = null;
+  private startTimestampParsed: Date | null = null;
   data: { [key: string]: Data[] } = {};
+  private dataInternal: { [key: string]: DataInternal[] } = {};
   private dataIndexManager: DataIndexManager = new DataIndexManager();
 
   constructor({
@@ -39,6 +41,8 @@ export class BHVESInstance {
     }
 
     this.startTimestamp = startTimestamp;
+    this.startTimestampParsed = new Date(startTimestamp);
+    
     const player = document.getElementById(videoPlayerDomId);
 
     if (!(player instanceof HTMLVideoElement)) {
@@ -59,21 +63,19 @@ export class BHVESInstance {
     onTimeUpdate?: ({ videoPlayerTimeSeconds, timestamp }: { videoPlayerTimeSeconds: number; timestamp: string }) => void
   ): void {
     player.addEventListener('timeupdate', () => {
-      const timestamp = convertVideoTimeToISOTimestamp(
-        this.startTimestamp!,
-        player.currentTime
-      );
+      const timestamp = convertVideoTimeToISOTimestamp(this.startTimestampParsed!, player.currentTime);
+      const currentTime = this.startTimestampParsed!.getTime() + (player.currentTime * 1000);
       
       // Get all events that should be displayed at current time
-      const currentMatchingIndexes = this.dataIndexManager.findMatchingIndexes(timestamp);
+      const matchingIndexes = this.dataIndexManager.findMatchingIndexes(timestamp);
       
       // Find the most recent event that should be active at current time
-      const activeMatchingIndexes = this.findActiveEvents(currentMatchingIndexes, timestamp);
+      const activeMatchingIndexes = this.findActiveEvents(matchingIndexes, currentTime);
 
       const state: State = {
         videoPlayerTimeSeconds: player.currentTime,
         timestamp,
-        matchingIndexes: currentMatchingIndexes,
+        matchingIndexes,
         activeMatchingIndexes,
       };
 
@@ -90,22 +92,21 @@ export class BHVESInstance {
    */
   private findActiveEvents(
     currentMatchingIndexes: { [key: string]: number[] },
-    timestamp: string
+    currentTime: number
   ): { [key: string]: number[] } {
     const activeMatchingIndexes: { [key: string]: number[] } = {};
-    const currentTime = new Date(timestamp).getTime();
 
     Object.entries(currentMatchingIndexes).forEach(([category, indexes]) => {
       let mostRecentIndex = -1;
       let mostRecentTime = -1;
 
       indexes.forEach(index => {
-        const item = this.data[category][index];
-        const itemStartTime = new Date(item.start_timestamp).getTime();
+        const item = this.dataInternal[category][index];
+        const itemStartTime = item.start_timestamp.getTime();
         
         if (item.end_timestamp) {
           // For events with end time, check if current time is within the range
-          const itemEndTime = new Date(item.end_timestamp).getTime();
+          const itemEndTime = item.end_timestamp.getTime();
           if (currentTime >= itemStartTime && currentTime <= itemEndTime && itemStartTime > mostRecentTime) {
             mostRecentIndex = index;
             mostRecentTime = itemStartTime;
@@ -125,6 +126,17 @@ export class BHVESInstance {
     });
 
     return activeMatchingIndexes;
+  }
+
+  /**
+   * Converts Data to DataInternal by parsing timestamps
+   */
+  private convertToInternalData(data: Data[]): DataInternal[] {
+    return data.map(item => ({
+      ...item,
+      start_timestamp: new Date(item.start_timestamp),
+      end_timestamp: item.end_timestamp ? new Date(item.end_timestamp) : undefined,
+    }));
   }
 
   /**
@@ -235,8 +247,14 @@ export class BHVESInstance {
           }
         }
 
+        // Store original data
         this.data[name] = parsedData;
-        await this.dataIndexManager.addData(name, parsedData, options?.sortData ?? true);
+        
+        // Convert to internal format with parsed timestamps
+        const internalData = this.convertToInternalData(parsedData);
+        this.dataInternal[name] = internalData;
+        
+        await this.dataIndexManager.addData(name, internalData, options?.sortData ?? true);
 
         results.push({
           name,
@@ -289,7 +307,7 @@ export class BHVESInstance {
 }
 
 export * from './types';
-export * from './utils/getMatchingData';
-export * from './utils/getShiftedIndexes';
-export * from './utils/getMovingWindowIndexes';
+export * from './publicUtils/getMatchingData';
+export * from './publicUtils/getShiftedIndexes';
+export * from './publicUtils/getMovingWindowIndexes';
 export * from './errors';

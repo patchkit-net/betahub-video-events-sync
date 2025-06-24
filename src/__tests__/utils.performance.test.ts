@@ -2,7 +2,7 @@ import { generateIntervalData, generateTestData, generateTimeIndexData } from '.
 
 import { DataIndexManager } from '../DataIndexManager';
 // import { IntervalTree } from '../utils/IntervalTree'; // Removed - file doesn't exist
-import { convertVideoTimeToISOTimestamp } from '../utils/convertVideoTimetoISOTimestamp';
+import { convertVideoTimeToISOTimestamp } from '../utils/convertVideoTimeToISOTimestamp';
 // import { filterDataByTimestamp } from '../utils/filterDataByTimestamp'; // Removed - file doesn't exist
 import { getMatchingData } from '../utils/getMatchingData';
 import { performance } from 'perf_hooks';
@@ -103,7 +103,7 @@ describe('Performance Tests', () => {
 
   describe('convertTimeToISOTimestamp', () => {
     test('should convert times quickly across different scales', () => {
-      const startTime = new Date().toISOString();
+      const startTime = new Date();
       const results: { size: number; avgMs: number }[] = [];
 
       DATA_SIZES.forEach(size => {

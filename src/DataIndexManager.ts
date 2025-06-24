@@ -1,4 +1,4 @@
-import type { Data } from './types';
+import type { Data, DataInternal } from './types';
 
 interface DataIndex {
   startTimes: number[];
@@ -9,7 +9,7 @@ interface DataIndex {
 export class DataIndexManager {
   private indexes: { [key: string]: DataIndex } = {};
 
-  async addData(category: string, data: Data[], sortData: boolean = true): Promise<void> {
+  async addData(category: string, data: DataInternal[], sortData: boolean = true): Promise<void> {
     const dataIndex: DataIndex = {
       startTimes: [],
       endTimes: [],
@@ -21,10 +21,10 @@ export class DataIndexManager {
     for (let i = 0; i < data.length; i += CHUNK_SIZE) {
       const chunk = data.slice(i, i + CHUNK_SIZE);
       
-      // Process chunk
+      // Process chunk - no need to parse timestamps anymore
       chunk.forEach((item, index) => {
-        const startTime = new Date(item.start_timestamp).getTime();
-        const endTime = item.end_timestamp ? new Date(item.end_timestamp).getTime() : Infinity;
+        const startTime = item.start_timestamp.getTime();
+        const endTime = item.end_timestamp?.getTime() ?? Infinity;
         
         dataIndex.startTimes.push(startTime);
         dataIndex.endTimes.push(endTime);
