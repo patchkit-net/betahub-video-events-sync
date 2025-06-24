@@ -16,4 +16,3 @@ export {
   createSuccessResponse,
   createErrorResponse
 } from './errorHandler';
-export { DataStore } from '../DataStore';
