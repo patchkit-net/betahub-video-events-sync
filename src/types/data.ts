@@ -30,6 +30,31 @@ export interface ProcessingResult {
   itemCount: number;
 }
 
+// Data entry types
+export interface AddDataEntry {
+  name: string;
+  dataJSONL: string;
+}
+
+export interface AddDataParams {
+  entries: AddDataEntry[];
+  options?: {
+    onProgress?: (status: {
+      status: 'loading' | 'error' | 'success';
+      progress: number;
+    }) => void;
+    onSuccess?: (data: { [key: string]: Data[] }) => void;
+    onError?: (error: {
+      message: string;
+      details?: {
+        successfulEntries?: ProcessingResult[];
+        failedEntries?: ProcessingError[];
+      };
+    }) => void;
+    sortData?: boolean;
+  };
+}
+
 // Data entry processing types
 export interface ProcessDataEntryResult {
   success: boolean;

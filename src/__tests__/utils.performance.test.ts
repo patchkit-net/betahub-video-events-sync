@@ -84,7 +84,7 @@ describe('Performance Tests', () => {
         manager.addData(category, internalData);
         
         // Measure timestamp finding
-        const ts = new Date(Date.now() + 5000 * 1000).toISOString();
+        const ts = new Date(Date.now() + 5000 * 1000);
         const start = performance.now();
         manager.findMatchingIndexes(ts);
         const end = performance.now();
@@ -163,7 +163,7 @@ describe('Performance Tests', () => {
         const addEnd = performance.now();
         const addElapsed = addEnd - addStart;
         
-        const ts = new Date(Date.now() + 5000 * 1000).toISOString();
+        const ts = new Date(Date.now() + 5000 * 1000);
         const findStart = performance.now();
         manager.findMatchingIndexes(ts);
         const findEnd = performance.now();

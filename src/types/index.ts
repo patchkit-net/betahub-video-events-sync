@@ -11,6 +11,8 @@ export type {
   Data,
   DataInternal,
   CategoryIndexes,
+  AddDataEntry,
+  AddDataParams,
   ProcessingError,
   ProcessingResult,
   ProcessDataEntryResult,

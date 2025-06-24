@@ -1,54 +1,49 @@
-# React + TypeScript + Vite
+# BHVES React Example
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a React + TypeScript + Vite example demonstrating the **BHVES (BetaHub Video Events Sync)** library.
 
-Currently, two official plugins are available:
+## What it demonstrates
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This example shows how to:
 
-## Expanding the ESLint configuration
+- Initialize a BHVES instance with a video player
+- Load and process JSONL data files (logs, interactions, test logs)
+- Display synchronized events that match the current video timestamp
+- Use moving window functionality to show context around current events
+- Handle real-time updates as the video plays
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Features
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- **Video Player Integration**: Synchronizes events with video playback
+- **Multiple Data Types**: Handles logs, interactions, and test data
+- **Moving Window**: Shows previous and upcoming events for context
+- **Real-time Updates**: Events appear/disappear based on video timestamp
+- **Progress Tracking**: Shows loading progress for large datasets
+
+## Data Files
+
+The example uses three JSONL files in the `public/data/` directory:
+- `logs.jsonl` - Log entries with no end timestamps (persistent)
+- `interactions.jsonl` - User interactions with start/end timestamps
+- `test_logs.jsonl` - Test log entries for demonstration
+
+## Running the Example
+
+```bash
+cd examples/react
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Then open your browser to the displayed URL and watch the video player synchronize with the displayed events.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## BHVES Library
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+This example uses the `betahub-video-events-sync` library which provides:
+- Efficient timestamp-based event indexing
+- Binary search for fast lookups
+- Support for multiple data categories
+- Moving window functionality for context
+- TypeScript support with full type safety
+
+For more information about the BHVES library, see the main project documentation.

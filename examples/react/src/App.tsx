@@ -97,13 +97,13 @@ export const App = () => {
       fetch('/data/interactions.jsonl').then((res) => res.text()),
       fetch('/data/test_logs.jsonl').then((res) => res.text()),
     ]).then(async ([logs, interactions, testLogs]) => {
-      await bhves.addData(
-        [
+      await bhves.addData({
+        entries: [
           { name: 'logs', dataJSONL: logs },
           { name: 'interactions', dataJSONL: interactions },
           { name: 'test_logs', dataJSONL: testLogs },
         ],
-        {
+        options: {
           sortData: false,
           onProgress: (status) => {
             setProgressData(status);
@@ -127,7 +127,7 @@ export const App = () => {
             setIsLoading(false);
           },
         }
-      );
+      });
     });
   }, []);
 

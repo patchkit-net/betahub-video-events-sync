@@ -2,33 +2,66 @@
 
 ' Main BHVES Interface
 class BHVESInstance {
-  +startTimestamp: string | null
-  +data: {[key: string]: Data[]}
+  -startTimestampParsed: Date | null
+  -dataStore: DataStore
+  -videoPlayer: HTMLVideoElement | null
+  -timeUpdateHandler: ((event: Event) => void) | null
+  +constructor(params: BHVESConstructorParams)
+  +addData(params: AddDataParams): Promise<Response<ProcessingResult[]>>
+  -setupVideoPlayer(onStateUpdate?: OnStateUpdateCallback, onTimeUpdate?: OnTimeUpdateCallback): void
+  -handleTimeUpdate(onStateUpdate?: OnStateUpdateCallback, onTimeUpdate?: OnTimeUpdateCallback): void
+  +destroy(): void
+  +get data(): {[key: string]: Data[]}
+}
+
+' Data Management Classes
+class DataStore {
+  -data: {[key: string]: Data[]}
+  -dataInternal: {[key: string]: DataInternal[]}
   -dataIndexManager: DataIndexManager
-  +constructor(config: Config)
-  +addData(entries: AddDataEntry[], options?: AddDataOptions): Promise<Response<{name: string, itemCount: number}[]>>
-  -setupVideoPlayer(player: HTMLVideoElement, onStateUpdate?: (update: StateUpdate) => void, onTimeUpdate?: (update: TimeUpdate) => void): void
-  -findActiveEvents(currentMatchingIndexes: {[key: string]: number[]}, timestamp: string): {[key: string]: number[]}
+  +storeData(name: string, data: Data[], sortData?: boolean): Promise<void>
+  +findMatchingIndexes(timestamp: Date): CategoryIndexes
+  +getData(): {[key: string]: Data[]}
+  +getDataInternal(): {[key: string]: DataInternal[]}
+  +clear(): void
+}
+
+class DataIndexManager {
+  -indexes: {[key: string]: DataIndex}
+  +addData(category: string, data: DataInternal[], sortData?: boolean): Promise<void>
+  +findMatchingIndexes(timestamp: Date): CategoryIndexes
+  +clear(): void
+}
+
+interface DataIndex {
+  +startTimes: number[]
+  +endTimes: number[]
+  +indexes: number[]
 }
 
 ' Configuration and Request Types
-class Config {
+class BHVESConstructorParams {
   +videoPlayerDomId: string
   +startTimestamp: string
-  +onTimeUpdate?: (update: TimeUpdate) => void
-  +onStateUpdate?: (update: StateUpdate) => void
+  +onTimeUpdate?: OnTimeUpdateCallback
+  +onStateUpdate?: OnStateUpdateCallback
+}
+
+class AddDataParams {
+  +entries: AddDataEntry[]
+  +options?: AddDataOptions
+}
+
+class AddDataOptions {
+  +onProgress?: ProgressCallback
+  +onSuccess?: SuccessCallback
+  +onError?: ErrorCallback
+  +sortData?: boolean
 }
 
 class AddDataEntry {
   +name: string
   +dataJSONL: string
-}
-
-class AddDataOptions {
-  +onProgress?: (status: {status: 'loading' | 'error' | 'success', progress: number}) => void
-  +onSuccess?: (data: {[key: string]: Data[]}) => void
-  +onError?: (error: {message: string, details?: {successfulEntries?: {name: string, itemCount: number}[], failedEntries?: {name: string, message: string, details?: Record<string, unknown>}[]}}) => void
-  +sortData?: boolean
 }
 
 ' Data Structures
@@ -40,39 +73,57 @@ class Data {
   +details?: object
 }
 
+class DataInternal {
+  +start_timestamp: Date
+  +end_timestamp?: Date
+  +type: string
+  +message?: string
+  +details?: object
+}
+
 class State {
   +videoPlayerTimeSeconds: number
   +timestamp: string
-  +matchingIndexes: {[key: string]: number[]}
-  +activeMatchingIndexes: {[key: string]: number[]}
+  +matchingIndexes: CategoryIndexes
+  +activeMatchingIndexes: CategoryIndexes
 }
 
 ' Callback Types
-class TimeUpdate {
-  +videoPlayerTimeSeconds: number
+class OnTimeUpdateCallback {
+  +(params: {videoPlayerTimeSeconds: number, timestamp: string}): void
+}
+
+class OnStateUpdateCallback {
+  +(params: {state: State, data: {[key: string]: Data[]}}): void
+}
+
+class ProgressCallback {
+  +(status: {status: 'loading' | 'error' | 'success', progress: number}): void
+}
+
+class SuccessCallback {
+  +(data: {[key: string]: Data[]}): void
+}
+
+class ErrorCallback {
+  +(error: {message: string, details?: {successfulEntries?: ProcessingResult[], failedEntries?: ProcessingError[]}}): void
+}
+
+' Error and Response Types
+class ErrorType {
+  +ValidationError
+  +DataProcessingError
+  +ConfigurationError
+  +UnknownError
+}
+
+class ErrorContext {
+  +operation: string
+  +component: string
   +timestamp: string
+  +additionalInfo?: Record<string, unknown>
 }
 
-class StateUpdate {
-  +state: State
-  +data: {[key: string]: Data[]}
-}
-
-' Time Index Components
-class DataIndexManager {
-  -indexes: {[key: string]: DataIndex}
-  +addData(category: string, data: Data[], sortData?: boolean): Promise<void>
-  +findMatchingIndexes(timestamp: string): {[key: string]: number[]}
-  +clear(): void
-}
-
-interface DataIndex {
-  +startTimes: number[]
-  +endTimes: number[]
-  +indexes: number[]
-}
-
-' Response Types
 class Response<T> {
   +status: 'success' | 'error'
   +message: string
@@ -81,23 +132,57 @@ class Response<T> {
   +timestamp: string
 }
 
+class ProcessingResult {
+  +name: string
+  +itemCount: number
+}
+
+class ProcessingError {
+  +name: string
+  +message: string
+  +details?: Record<string, unknown>
+}
+
+class CategoryIndexes {
+  +{[key: string]: number[]}
+}
+
 ' Relationships
-BHVESInstance --> Config: uses
-BHVESInstance --> Data: contains
-BHVESInstance --> State: uses
-BHVESInstance --> DataIndexManager: contains
-BHVESInstance --> AddDataOptions: uses
+BHVESInstance --> BHVESConstructorParams: uses
+BHVESInstance --> AddDataParams: uses
+BHVESInstance --> DataStore: contains
+BHVESInstance --> OnStateUpdateCallback: optional callback
+BHVESInstance --> OnTimeUpdateCallback: optional callback
+BHVESInstance --> Response: returns
+
+DataStore --> Data: stores
+DataStore --> DataInternal: stores
+DataStore --> DataIndexManager: contains
+DataStore --> CategoryIndexes: returns
+
 DataIndexManager --> DataIndex: contains
-DataIndexManager --> Data: indexes
-Config --> TimeUpdate: optional callback
-Config --> StateUpdate: optional callback
+DataIndexManager --> DataInternal: indexes
+DataIndexManager --> CategoryIndexes: returns
+
+AddDataParams --> AddDataEntry: contains
+AddDataParams --> AddDataOptions: optional
 AddDataEntry --> Data: references
-StateUpdate --> State: contains
+State --> CategoryIndexes: contains
+OnStateUpdateCallback --> State: uses
+OnStateUpdateCallback --> Data: uses
+
+Response --> ProcessingResult: can contain
+Response --> ProcessingError: can contain
 
 ' Notes
 note right of DataIndexManager
   Optimizes timestamp-based lookups
-  using binary search
+  using binary search with Date objects
+end note
+
+note right of DataStore
+  Manages both original and internal
+  data formats for performance
 end note
 
 note right of BHVESInstance
@@ -105,9 +190,9 @@ note right of BHVESInstance
   event synchronization
 end note
 
-note right of Data
-  Represents a single
-  event or log entry
+note right of DataInternal
+  Internal format with parsed
+  Date objects for performance
 end note
 
 @enduml 

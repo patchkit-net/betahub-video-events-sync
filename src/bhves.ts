@@ -1,13 +1,13 @@
 import type {
+  AddDataParams,
   BHVESConstructorParams,
   Data,
   OnStateUpdateCallback,
   OnTimeUpdateCallback,
+  ProcessMultipleEntriesOptions,
   Response,
   State,
 } from './types';
-
-import { DataStore } from './DataStore';
 import {
   convertVideoTimeToISOTimestamp,
   countTotalItems,
@@ -19,8 +19,9 @@ import {
   parseTimestamp,
   processMultipleEntries,
   validateRequiredString,
-  type ProcessMultipleEntriesOptions,
 } from './utils';
+
+import { DataStore } from './DataStore';
 
 /**
  * BHVESInstance manages video event synchronization by tracking and displaying
@@ -136,28 +137,10 @@ export class BHVESInstance {
   /**
    * Adds event data to the instance and indexes it for time-based lookups
    */
-  async addData(
-    entries: { name: string; dataJSONL: string }[],
-    options?: {
-      onProgress?: (status: {
-        status: 'loading' | 'error' | 'success';
-        progress: number;
-      }) => void;
-      onSuccess?: (data: { [key: string]: Data[] }) => void;
-      onError?: (error: {
-        message: string;
-        details?: {
-          successfulEntries?: { name: string; itemCount: number }[];
-          failedEntries?: {
-            name: string;
-            message: string;
-            details?: Record<string, unknown>;
-          }[];
-        };
-      }) => void;
-      sortData?: boolean;
-    }
-  ): Promise<Response<{ name: string; itemCount: number }[]>> {
+  async addData({
+    entries,
+    options,
+  }: AddDataParams): Promise<Response<{ name: string; itemCount: number }[]>> {
     const totalItems = countTotalItems(entries);
     const processOptions: ProcessMultipleEntriesOptions = {
       onProgress: options?.onProgress,

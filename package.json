@@ -25,6 +25,7 @@
   ],
   "author": "Upsoft sp. z o.o.",
   "description": "BetaHub Video Events Sync - Synchronize time-based data with video player",
+  "license": "MIT",
   "dependencies": {},
   "devDependencies": {
     "@types/jest": "^30.0.0",

@@ -42,32 +42,35 @@ const bhves = new BHVESInstance({
 
 ```typescript
 // Add data from JSONL files or strings
-await bhves.addData([
-  { 
-    name: 'logs', 
-    dataJSONL: '{"start_timestamp":"2025-06-12T14:03:20","type":"log","message":"Event 1"}\n{"start_timestamp":"2025-06-12T14:03:25","type":"log","message":"Event 2"}'
-  },
-  { 
-    name: 'interactions', 
-    dataJSONL: '{"start_timestamp":"2025-06-12T14:03:22","end_timestamp":"2025-06-12T14:03:24","type":"interaction","message":"Click"}' 
-  }
-], {
-  // Optional: Sort data by start time
-  sortData: true,
-  
-  // Optional: Track loading progress
-  onProgress: (status) => {
-    console.log(`Loading: ${status.progress}%`);
-  },
-  
-  // Optional: Handle successful data loading
-  onSuccess: (data) => {
-    console.log('Data loaded successfully:', data);
-  },
-  
-  // Optional: Handle errors
-  onError: (error) => {
-    console.error('Error loading data:', error);
+await bhves.addData({
+  entries: [
+    { 
+      name: 'logs', 
+      dataJSONL: '{"start_timestamp":"2025-06-12T14:03:20","type":"log","message":"Event 1"}\n{"start_timestamp":"2025-06-12T14:03:25","type":"log","message":"Event 2"}'
+    },
+    { 
+      name: 'interactions', 
+      dataJSONL: '{"start_timestamp":"2025-06-12T14:03:22","end_timestamp":"2025-06-12T14:03:24","type":"interaction","message":"Click"}' 
+    }
+  ],
+  options: {
+    // Optional: Sort data by start time
+    sortData: true,
+    
+    // Optional: Track loading progress
+    onProgress: (status) => {
+      console.log(`Loading: ${status.progress}%`);
+    },
+    
+    // Optional: Handle successful data loading
+    onSuccess: (data) => {
+      console.log('Data loaded successfully:', data);
+    },
+    
+    // Optional: Handle errors
+    onError: (error) => {
+      console.error('Error loading data:', error);
+    }
   }
 });
 ```
