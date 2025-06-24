@@ -27,13 +27,11 @@ export interface BHVLError {
   timestamp: string;
 }
 
-export interface ErrorResponse {
-  status: 'error';
-  error: BHVLError;
-}
-
-export interface SuccessResponse<T = void> {
-  status: 'success';
+// Standardized response type for all API responses
+export interface Response<T = void> {
+  status: 'success' | 'error';
+  message: string;
   data?: T;
-  message?: string;
+  details?: Record<string, unknown>;
+  timestamp: string;
 } 

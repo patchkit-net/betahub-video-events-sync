@@ -5,8 +5,7 @@ export type {
   ErrorContext,
   ErrorInfo,
   BHVLError,
-  ErrorResponse,
-  SuccessResponse,
+  Response,
 } from './errors';
 
 // Data-related types
@@ -19,7 +18,6 @@ export type {
 // State-related types
 export type {
   State,
-  Response,
 } from './state';
 
 // Callback-related types
