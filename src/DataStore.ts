@@ -77,34 +77,6 @@ export class DataStore {
   }
 
   /**
-   * Gets data for a specific category
-   */
-  getCategoryData(category: string): Data[] | undefined {
-    return this.data[category];
-  }
-
-  /**
-   * Gets internal data for a specific category
-   */
-  getCategoryDataInternal(category: string): DataInternal[] | undefined {
-    return this.dataInternal[category];
-  }
-
-  /**
-   * Checks if data exists for a category
-   */
-  hasCategory(category: string): boolean {
-    return category in this.data;
-  }
-
-  /**
-   * Gets all category names
-   */
-  getCategories(): string[] {
-    return Object.keys(this.data);
-  }
-
-  /**
    * Clears all stored data
    */
   clear(): void {

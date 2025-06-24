@@ -27,7 +27,6 @@ import {
  * events that should be active at specific timestamps during video playback.
  */
 export class BHVESInstance {
-  startTimestamp: string | null = null;
   private startTimestampParsed: Date | null = null;
   private dataStore: DataStore = new DataStore();
   private videoPlayer: HTMLVideoElement | null = null;
@@ -45,7 +44,6 @@ export class BHVESInstance {
     validateRequiredString(videoPlayerDomId, 'videoPlayerDomId', context);
     validateRequiredString(startTimestamp, 'startTimestamp', context);
 
-    this.startTimestamp = startTimestamp;
     this.startTimestampParsed = parseTimestamp(startTimestamp);
 
     this.videoPlayer = findVideoPlayer(videoPlayerDomId);

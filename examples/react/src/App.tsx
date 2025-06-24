@@ -41,10 +41,11 @@ export const App = () => {
   };
 
   useEffect(() => {
+    const startTimestamp = '2025-06-12T14:03:20';
     // Initialize BHVES instance
     const bhves = new BHVESInstance({
       videoPlayerDomId: 'player1',
-      startTimestamp: '2025-06-12T14:03:20',
+      startTimestamp,
       onTimeUpdate: ({ videoPlayerTimeSeconds, timestamp }) => {
         setEventsTime(timestamp);
         console.log('videoPlayerTimeSeconds', videoPlayerTimeSeconds);
@@ -114,7 +115,7 @@ export const App = () => {
             }
           },
           onSuccess: (data) => {
-            setEventsTime(bhves.startTimestamp);
+            setEventsTime(startTimestamp);
             setAppendLogsData(data.logs.slice(0, 7));
             setAppendTestLogsData(data.test_logs.slice(0, 7));
           },
