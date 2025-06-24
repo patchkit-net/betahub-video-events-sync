@@ -1,10 +1,10 @@
 /**
- * Validates a timestamp string and returns a parsed Date object
- * @param timestamp - The timestamp string to validate
+ * Parses and validates a timestamp string, returning a Date object
+ * @param timestamp - The timestamp string to parse and validate
  * @returns The parsed Date object
  * @throws Error if the timestamp is invalid
  */
-export function validateTimestamp(timestamp: string): Date {
+export function parseTimestamp(timestamp: string): Date {
   if (!timestamp || typeof timestamp !== 'string') {
     throw new Error('Timestamp must be a non-empty string');
   }

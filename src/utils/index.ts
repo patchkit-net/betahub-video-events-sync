@@ -4,7 +4,7 @@ export { findActiveEvents } from './findActiveEvents';
 export { processDataEntry, type ProcessDataEntryResult, type ProcessDataEntryOptions } from './processDataEntries';
 export { countTotalItems } from './countTotalItems';
 export { validateDataJSONL } from './validateDataJSONL';
-export { validateTimestamp } from './validateTimestamp';
+export { parseTimestamp } from './parseTimestamp';
 export { validateVideoPlayer } from './validateVideoPlayer';
 export { handleDataProcessingErrors, type ProcessingError, type ProcessingResult, type ErrorHandlingOptions } from './handleDataProcessingErrors';
 export { handleDataProcessingSuccess, type SuccessHandlingOptions } from './handleDataProcessingSuccess';

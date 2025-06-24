@@ -17,9 +17,9 @@ import {
   findActiveEvents,
   handleDataProcessingErrors,
   handleDataProcessingSuccess,
+  parseTimestamp,
   processDataEntry,
   validateRequiredString,
-  validateTimestamp,
   validateVideoPlayer,
   type ProcessDataEntryOptions,
   type ProcessingError,
@@ -52,7 +52,7 @@ export class BHVESInstance {
     validateRequiredString(startTimestamp, 'startTimestamp', context);
 
     this.startTimestamp = startTimestamp;
-    this.startTimestampParsed = validateTimestamp(startTimestamp);
+    this.startTimestampParsed = parseTimestamp(startTimestamp);
 
     const player = validateVideoPlayer(videoPlayerDomId);
     this.videoPlayer = player;
