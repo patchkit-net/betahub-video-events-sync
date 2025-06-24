@@ -25,20 +25,3 @@ export const getMatchingData = (
     {}
   );
 };
-
-/**
- * Internal version that works with DataInternal for better performance.
- * This function is used internally when we have parsed timestamps.
- */
-export const getMatchingDataInternal = (
-  matchingIndexes: { [key: string]: number[] },
-  data: { [key: string]: DataInternal[] }
-): { [key: string]: DataInternal[] } => {
-  return Object.entries(matchingIndexes).reduce(
-    (acc, [category, indexes]) => ({
-      ...acc,
-      [category]: indexes.map(index => data[category][index])
-    }),
-    {}
-  );
-}; 

@@ -63,8 +63,10 @@ export class BHVESInstance {
     onTimeUpdate?: ({ videoPlayerTimeSeconds, timestamp }: { videoPlayerTimeSeconds: number; timestamp: string }) => void
   ): void {
     player.addEventListener('timeupdate', () => {
-      const timestamp = convertVideoTimeToISOTimestamp(this.startTimestampParsed!, player.currentTime);
-      const currentTime = this.startTimestampParsed!.getTime() + (player.currentTime * 1000);
+      const videoPlayerTimeSeconds = player.currentTime;
+      const videoPlayerTimeMilliseconds = videoPlayerTimeSeconds * 1000;
+      const timestamp = convertVideoTimeToISOTimestamp(this.startTimestampParsed!, videoPlayerTimeMilliseconds);
+      const currentTime = this.startTimestampParsed!.getTime() + videoPlayerTimeMilliseconds;
       
       // Get all events that should be displayed at current time
       const matchingIndexes = this.dataIndexManager.findMatchingIndexes(timestamp);
