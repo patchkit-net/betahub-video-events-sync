@@ -94,9 +94,10 @@ export class BHVESInstance {
     const videoPlayerTimeMilliseconds = videoPlayerTimeSeconds * 1000;
     const timestamp = convertVideoTimeToISOTimestamp(this.startTimestampParsed, videoPlayerTimeSeconds);
     const currentTime = this.startTimestampParsed.getTime() + videoPlayerTimeMilliseconds;
+    const currentTimeDate = new Date(currentTime);
     
     // Get all events that should be displayed at current time
-    const matchingIndexes = this.dataIndexManager.findMatchingIndexes(timestamp);
+    const matchingIndexes = this.dataIndexManager.findMatchingIndexes(currentTimeDate);
     
     // Find the most recent event that should be active at current time
     const activeMatchingIndexes = findActiveEvents(matchingIndexes, this.dataInternal, currentTime);
@@ -271,8 +272,9 @@ export class BHVESInstance {
     const videoPlayerTimeMilliseconds = videoPlayerTimeSeconds * 1000;
     const timestamp = convertVideoTimeToISOTimestamp(this.startTimestampParsed, videoPlayerTimeSeconds);
     const currentTime = this.startTimestampParsed.getTime() + videoPlayerTimeMilliseconds;
+    const currentTimeDate = new Date(currentTime);
     
-    const matchingIndexes = this.dataIndexManager.findMatchingIndexes(timestamp);
+    const matchingIndexes = this.dataIndexManager.findMatchingIndexes(currentTimeDate);
     const activeMatchingIndexes = findActiveEvents(matchingIndexes, this.dataInternal, currentTime);
 
     return {

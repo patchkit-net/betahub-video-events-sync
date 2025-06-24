@@ -51,9 +51,9 @@ export class DataIndexManager {
     this.indexes[category] = dataIndex;
   }
 
-  findMatchingIndexes(timestamp: string): { [key: string]: number[] } {
+  findMatchingIndexes(timestamp: Date): { [key: string]: number[] } {
     const result: { [key: string]: number[] } = {};
-    const currentTime = new Date(timestamp).getTime();
+    const currentTime = timestamp.getTime();
 
     Object.entries(this.indexes).forEach(([category, index]) => {
       const matchingIndexes: number[] = [];
