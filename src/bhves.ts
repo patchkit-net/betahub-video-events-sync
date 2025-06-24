@@ -82,7 +82,6 @@ export class BHVESInstance {
     if (!this.startTimestampParsed) {
       throw createStandardError({
         type: 'ConfigurationError',
-        code: 'START_TIMESTAMP_NOT_INITIALIZED',
         message: 'startTimestampParsed is not initialized',
         context: {
           ...context,
@@ -191,7 +190,6 @@ export class BHVESInstance {
         if (result.itemCount === undefined) {
           throw createStandardError({
             type: 'DataProcessingError',
-            code: 'ITEM_COUNT_UNDEFINED',
             message: `Item count is undefined for entry: ${name}`,
             context: {
               operation: 'processDataEntries',
@@ -237,10 +235,10 @@ export class BHVESInstance {
     } catch (error) {
       throw createStandardError({
         type: 'DataProcessingError',
-        code: 'DATA_STORAGE_FAILED',
         message: `Failed to store data for entry "${name}": ${error instanceof Error ? error.message : String(error)}`,
         context: {
-          ...context,
+          operation: 'storeProcessedData',
+          component: 'BHVESInstance',
           timestamp: new Date().toISOString(),
           additionalInfo: { entryName: name, dataLength: data.length, sortData },
         },

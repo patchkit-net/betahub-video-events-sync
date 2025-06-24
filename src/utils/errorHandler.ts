@@ -9,7 +9,6 @@ export interface ErrorContext {
 
 export interface ErrorInfo {
   type: ErrorType;
-  code: string;
   message: string;
   context?: ErrorContext;
   originalError?: Error;
@@ -26,7 +25,6 @@ export function createStandardError(
   
   // Add custom properties for better error handling
   (error as any).type = errorInfo.type;
-  (error as any).code = errorInfo.code;
   (error as any).context = errorInfo.context;
   (error as any).originalError = errorInfo.originalError;
   (error as any).details = details;
@@ -36,7 +34,6 @@ export function createStandardError(
   if (process.env.NODE_ENV === 'development') {
     console.error('BHVES Error:', {
       type: errorInfo.type,
-      code: errorInfo.code,
       message: errorInfo.message,
       context: errorInfo.context,
       originalError: errorInfo.originalError?.message,
@@ -104,7 +101,6 @@ export function withErrorHandling<T>(
       return result.catch((error) => {
         throw createStandardError({
           type: errorType,
-          code: `${context.component.toUpperCase()}_${context.operation.toUpperCase()}_ERROR`,
           message: `Failed to ${context.operation} in ${context.component}: ${error.message}`,
           context: errorContext,
           originalError: error instanceof Error ? error : new Error(String(error)),
@@ -116,7 +112,6 @@ export function withErrorHandling<T>(
   } catch (error) {
     throw createStandardError({
       type: errorType,
-      code: `${context.component.toUpperCase()}_${context.operation.toUpperCase()}_ERROR`,
       message: `Failed to ${context.operation} in ${context.component}: ${error instanceof Error ? error.message : String(error)}`,
       context: errorContext,
       originalError: error instanceof Error ? error : new Error(String(error)),
@@ -135,7 +130,6 @@ export function validateRequired<T>(
   if (value === null || value === undefined) {
     throw createStandardError({
       type: 'ValidationError',
-      code: 'MISSING_REQUIRED_PARAMETER',
       message: `${name} is required`,
       context: {
         ...context,
@@ -157,7 +151,6 @@ export function validateString(
   if (typeof value !== 'string' || value.trim() === '') {
     throw createStandardError({
       type: 'ValidationError',
-      code: 'INVALID_STRING_PARAMETER',
       message: `${name} must be a non-empty string`,
       context: {
         ...context,
