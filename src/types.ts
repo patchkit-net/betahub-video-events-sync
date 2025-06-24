@@ -60,3 +60,19 @@ export interface State {
   matchingIndexes: { [key: string]: number[] };
   activeMatchingIndexes: { [key: string]: number[] };
 }
+
+// Constructor parameter interfaces
+export interface OnStateUpdateCallback {
+  (params: { state: State; data: { [key: string]: Data[] } }): void;
+}
+
+export interface OnTimeUpdateCallback {
+  (params: { videoPlayerTimeSeconds: number; timestamp: string }): void;
+}
+
+export interface BHVESConstructorParams {
+  videoPlayerDomId: string;
+  startTimestamp: string;
+  onStateUpdate?: OnStateUpdateCallback;
+  onTimeUpdate?: OnTimeUpdateCallback;
+}

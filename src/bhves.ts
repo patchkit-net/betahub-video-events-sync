@@ -1,4 +1,4 @@
-import type { Data, DataInternal, Response, State } from './types';
+import type { Data, DataInternal, Response, State, BHVESConstructorParams, OnStateUpdateCallback, OnTimeUpdateCallback } from './types';
 import { createErrorResponse, createSuccessResponse } from './errors';
 
 import { DataIndexManager } from './DataIndexManager';
@@ -8,7 +8,8 @@ import {
   findActiveEvents,
   processDataEntry,
   type ProcessDataEntryOptions,
-  countTotalItems
+  countTotalItems,
+  validateTimestamp
 } from './utils';
 
 /**
@@ -27,18 +28,7 @@ export class BHVESInstance {
     startTimestamp,
     onStateUpdate,
     onTimeUpdate,
-  }: {
-    videoPlayerDomId: string;
-    startTimestamp: string;
-    onStateUpdate?: ({
-      state,
-      data,
-    }: {
-      state: State;
-      data: { [key: string]: Data[] };
-    }) => void;
-    onTimeUpdate?: ({ videoPlayerTimeSeconds, timestamp }: { videoPlayerTimeSeconds: number; timestamp: string }) => void;
-  }) {
+  }: BHVESConstructorParams) {
     if (!videoPlayerDomId) {
       throw new Error('videoPlayerDomId is required');
     }
@@ -47,7 +37,7 @@ export class BHVESInstance {
     }
 
     this.startTimestamp = startTimestamp;
-    this.startTimestampParsed = new Date(startTimestamp);
+    this.startTimestampParsed = validateTimestamp(startTimestamp);
     
     const player = document.getElementById(videoPlayerDomId);
 
@@ -65,8 +55,8 @@ export class BHVESInstance {
    */
   private setupVideoPlayer(
     player: HTMLVideoElement,
-    onStateUpdate?: ({ state, data }: { state: State; data: { [key: string]: Data[] } }) => void,
-    onTimeUpdate?: ({ videoPlayerTimeSeconds, timestamp }: { videoPlayerTimeSeconds: number; timestamp: string }) => void
+    onStateUpdate?: OnStateUpdateCallback,
+    onTimeUpdate?: OnTimeUpdateCallback
   ): void {
     player.addEventListener('timeupdate', () => {
       if (!this.startTimestampParsed) {
@@ -153,9 +143,13 @@ export class BHVESInstance {
         
         await this.dataIndexManager.addData(name, internalData, options?.sortData ?? true);
 
+        if (result.itemCount === undefined) {
+          throw new Error(`Item count is undefined for entry: ${name}`);
+        }
+
         results.push({
           name,
-          itemCount: result.itemCount!,
+          itemCount: result.itemCount,
         });
       } else if (result.error) {
         errors.push({
