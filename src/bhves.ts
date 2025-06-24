@@ -15,12 +15,12 @@ import {
   countTotalItems,
   createStandardError,
   findActiveEvents,
+  findVideoPlayer,
   handleDataProcessingErrors,
   handleDataProcessingSuccess,
   parseTimestamp,
   processDataEntry,
   validateRequiredString,
-  validateVideoPlayer,
   type ProcessDataEntryOptions,
   type ProcessingError,
   type ProcessingResult,
@@ -54,9 +54,8 @@ export class BHVESInstance {
     this.startTimestamp = startTimestamp;
     this.startTimestampParsed = parseTimestamp(startTimestamp);
 
-    const player = validateVideoPlayer(videoPlayerDomId);
-    this.videoPlayer = player;
-    this.setupVideoPlayer(player, onStateUpdate, onTimeUpdate);
+    this.videoPlayer = findVideoPlayer(videoPlayerDomId);
+    this.setupVideoPlayer(this.videoPlayer, onStateUpdate, onTimeUpdate);
   }
 
   /**

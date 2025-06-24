@@ -5,7 +5,7 @@ export { processDataEntry, type ProcessDataEntryResult, type ProcessDataEntryOpt
 export { countTotalItems } from './countTotalItems';
 export { validateDataJSONL } from './validateDataJSONL';
 export { parseTimestamp } from './parseTimestamp';
-export { validateVideoPlayer } from './validateVideoPlayer';
+export { findVideoPlayer } from './findVideoPlayer';
 export { handleDataProcessingErrors, type ProcessingError, type ProcessingResult, type ErrorHandlingOptions } from './handleDataProcessingErrors';
 export { handleDataProcessingSuccess, type SuccessHandlingOptions } from './handleDataProcessingSuccess';
 export { 

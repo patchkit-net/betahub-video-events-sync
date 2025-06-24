@@ -1,10 +1,10 @@
 /**
- * Validates and retrieves a video player element by ID
+ * Finds, validates and retrieves a video player element by ID
  * @param videoPlayerDomId - The DOM ID of the video element
  * @returns The HTMLVideoElement
  * @throws Error if the element is not found or not a video element
  */
-export function validateVideoPlayer(videoPlayerDomId: string): HTMLVideoElement {
+export function findVideoPlayer(videoPlayerDomId: string): HTMLVideoElement {
   if (!videoPlayerDomId || typeof videoPlayerDomId !== 'string') {
     throw new Error('videoPlayerDomId must be a non-empty string');
   }
