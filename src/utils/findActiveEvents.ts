@@ -1,14 +1,14 @@
-import type { DataInternal } from '../types';
+import type { CategoryIndexes, DataInternal } from '../types';
 
 /**
  * Finds the most recent event that should be active at the given timestamp
  */
 export function findActiveEvents(
-  currentMatchingIndexes: { [key: string]: number[] },
+  currentMatchingIndexes: CategoryIndexes,
   dataInternal: { [key: string]: DataInternal[] },
   currentTime: number
-): { [key: string]: number[] } {
-  const activeMatchingIndexes: { [key: string]: number[] } = {};
+): CategoryIndexes {
+  const activeMatchingIndexes: CategoryIndexes = {};
 
   Object.entries(currentMatchingIndexes).forEach(([category, indexes]) => {
     let mostRecentIndex = -1;

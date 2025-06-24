@@ -54,11 +54,14 @@ export interface DataInternal {
   details?: object;
 }
 
+// Standardized type for category-to-indexes mapping
+export type CategoryIndexes = { [key: string]: number[] };
+
 export interface State {
   videoPlayerTimeSeconds: number;
   timestamp: string;
-  matchingIndexes: { [key: string]: number[] };
-  activeMatchingIndexes: { [key: string]: number[] };
+  matchingIndexes: CategoryIndexes;
+  activeMatchingIndexes: CategoryIndexes;
 }
 
 // Constructor parameter interfaces

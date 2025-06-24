@@ -1,4 +1,4 @@
-import type { Data, DataInternal } from './types';
+import type { CategoryIndexes, Data, DataInternal } from './types';
 
 interface DataIndex {
   startTimes: number[];
@@ -51,8 +51,8 @@ export class DataIndexManager {
     this.indexes[category] = dataIndex;
   }
 
-  findMatchingIndexes(timestamp: Date): { [key: string]: number[] } {
-    const result: { [key: string]: number[] } = {};
+  findMatchingIndexes(timestamp: Date): CategoryIndexes {
+    const result: CategoryIndexes = {};
     const currentTime = timestamp.getTime();
 
     Object.entries(this.indexes).forEach(([category, index]) => {
