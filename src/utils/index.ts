@@ -6,3 +6,13 @@ export { countTotalItems } from './countTotalItems';
 export { validateDataJSONL } from './validateDataJSONL';
 export { validateTimestamp } from './validateTimestamp';
 export { validateVideoPlayer } from './validateVideoPlayer';
+export { handleDataProcessingErrors, type ProcessingError, type ProcessingResult, type ErrorHandlingOptions } from './handleDataProcessingErrors';
+export { handleDataProcessingSuccess, type SuccessHandlingOptions } from './handleDataProcessingSuccess';
+export { 
+  createStandardError, 
+  withErrorHandling, 
+  validateRequired, 
+  validateString,
+  type ErrorContext,
+  type ErrorInfo
+} from './errorHandler';

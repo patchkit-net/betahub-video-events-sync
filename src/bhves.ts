@@ -10,7 +10,14 @@ import {
   type ProcessDataEntryOptions,
   countTotalItems,
   validateTimestamp,
-  validateVideoPlayer
+  validateVideoPlayer,
+  handleDataProcessingErrors,
+  handleDataProcessingSuccess,
+  validateRequired,
+  validateString,
+  createStandardError,
+  type ProcessingError,
+  type ProcessingResult
 } from './utils';
 
 /**
@@ -32,12 +39,13 @@ export class BHVESInstance {
     onStateUpdate,
     onTimeUpdate,
   }: BHVESConstructorParams) {
-    if (!videoPlayerDomId) {
-      throw new Error('videoPlayerDomId is required');
-    }
-    if (!startTimestamp) {
-      throw new Error('startTimestamp is required');
-    }
+    const context = { operation: 'initialize', component: 'BHVESInstance' };
+
+    // Validate required parameters
+    validateRequired(videoPlayerDomId, 'videoPlayerDomId', context);
+    validateRequired(startTimestamp, 'startTimestamp', context);
+    validateString(videoPlayerDomId, 'videoPlayerDomId', context);
+    validateString(startTimestamp, 'startTimestamp', context);
 
     this.startTimestamp = startTimestamp;
     this.startTimestampParsed = validateTimestamp(startTimestamp);
@@ -70,8 +78,18 @@ export class BHVESInstance {
     onStateUpdate?: OnStateUpdateCallback,
     onTimeUpdate?: OnTimeUpdateCallback
   ): void {
+    const context = { operation: 'handleTimeUpdate', component: 'BHVESInstance' };
+
     if (!this.startTimestampParsed) {
-      throw new Error('startTimestampParsed is not initialized');
+      throw createStandardError({
+        type: 'ConfigurationError',
+        code: 'START_TIMESTAMP_NOT_INITIALIZED',
+        message: 'startTimestampParsed is not initialized',
+        context: {
+          ...context,
+          timestamp: new Date().toISOString(),
+        },
+      });
     }
 
     const videoPlayerTimeSeconds = player.currentTime;
@@ -124,14 +142,39 @@ export class BHVESInstance {
       sortData?: boolean;
     }
   ): Promise<Response<{ name: string; itemCount: number }[]>> {
-    const results: { name: string; itemCount: number }[] = [];
-    const errors: {
-      name: string;
-      message: string;
-      details?: Record<string, unknown>;
-    }[] = [];
-    let totalProgress = 0;
     const totalItems = countTotalItems(entries);
+    const { results, errors } = await this.processDataEntries(entries, totalItems, options);
+
+    if (errors.length > 0) {
+      return handleDataProcessingErrors(results, errors, { onError: options?.onError });
+    }
+
+    return handleDataProcessingSuccess(results, this.data, {
+      onProgress: options?.onProgress,
+      onSuccess: options?.onSuccess,
+    });
+  }
+
+  /**
+   * Processes multiple data entries and returns results and errors
+   */
+  private async processDataEntries(
+    entries: { name: string; dataJSONL: string }[],
+    totalItems: number,
+    options?: {
+      onProgress?: (status: {
+        status: 'loading' | 'error' | 'success';
+        progress: number;
+      }) => void;
+      sortData?: boolean;
+    }
+  ): Promise<{
+    results: ProcessingResult[];
+    errors: ProcessingError[];
+  }> {
+    const results: ProcessingResult[] = [];
+    const errors: ProcessingError[] = [];
+    let totalProgress = 0;
 
     for (const { name, dataJSONL } of entries) {
       const processOptions: ProcessDataEntryOptions = {
@@ -144,17 +187,20 @@ export class BHVESInstance {
       totalProgress = processOptions.totalProgress;
 
       if (result.success && result.data) {
-        // Store original data
-        this.data[name] = result.data;
-        
-        // Convert to internal format with parsed timestamps
-        const internalData = convertToInternalData(result.data);
-        this.dataInternal[name] = internalData;
-        
-        await this.dataIndexManager.addData(name, internalData, options?.sortData ?? true);
+        await this.storeProcessedData(name, result.data, options?.sortData ?? true);
 
         if (result.itemCount === undefined) {
-          throw new Error(`Item count is undefined for entry: ${name}`);
+          throw createStandardError({
+            type: 'DataProcessingError',
+            code: 'ITEM_COUNT_UNDEFINED',
+            message: `Item count is undefined for entry: ${name}`,
+            context: {
+              operation: 'processDataEntries',
+              component: 'BHVESInstance',
+              timestamp: new Date().toISOString(),
+              additionalInfo: { entryName: name },
+            },
+          });
         }
 
         results.push({
@@ -170,31 +216,38 @@ export class BHVESInstance {
       }
     }
 
-    if (errors.length > 0) {
-      const errorResponse = createErrorResponse<{ name: string; itemCount: number }[]>('Some entries failed to process', {
-        successfulEntries: results,
-        failedEntries: errors,
-      });
-      options?.onError?.({
-        message: errorResponse.message,
-        details: errorResponse.details,
-      });
-      return errorResponse;
-    }
+    return { results, errors };
+  }
 
-    if (options?.onProgress) {
-      options.onProgress({
-        status: 'success',
-        progress: 100,
+  /**
+   * Stores processed data in both original and internal formats and indexes it
+   */
+  private async storeProcessedData(name: string, data: Data[], sortData: boolean): Promise<void> {
+    const context = { operation: 'storeProcessedData', component: 'BHVESInstance' };
+
+    try {
+      // Store original data
+      this.data[name] = data;
+      
+      // Convert to internal format with parsed timestamps
+      const internalData = convertToInternalData(data);
+      this.dataInternal[name] = internalData;
+      
+      // Add to index manager
+      await this.dataIndexManager.addData(name, internalData, sortData);
+    } catch (error) {
+      throw createStandardError({
+        type: 'DataProcessingError',
+        code: 'DATA_STORAGE_FAILED',
+        message: `Failed to store data for entry "${name}": ${error instanceof Error ? error.message : String(error)}`,
+        context: {
+          ...context,
+          timestamp: new Date().toISOString(),
+          additionalInfo: { entryName: name, dataLength: data.length, sortData },
+        },
+        originalError: error instanceof Error ? error : new Error(String(error)),
       });
     }
-
-    const successResponse = createSuccessResponse<{ name: string; itemCount: number }[]>(
-      results,
-      `Successfully processed ${results.length} entries`
-    );
-    options?.onSuccess?.(this.data);
-    return successResponse;
   }
 
   /**
