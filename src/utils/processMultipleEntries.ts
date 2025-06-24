@@ -1,19 +1,13 @@
-import type { Data } from '../types';
-import { processDataEntry, type ProcessDataEntryOptions } from './processDataEntries';
+import type {
+  ProcessDataEntryOptions,
+  ProcessMultipleEntriesOptions,
+  ProcessingError,
+  ProcessingResult,
+  StorageFunction,
+} from '../types';
+
 import { createStandardError } from './errorHandler';
-import type { ProcessingError, ProcessingResult } from './handleDataProcessingErrors';
-
-export interface ProcessMultipleEntriesOptions {
-  onProgress?: (status: {
-    status: 'loading' | 'error' | 'success';
-    progress: number;
-  }) => void;
-  sortData?: boolean;
-}
-
-export interface StorageFunction {
-  (name: string, data: Data[], sortData: boolean): Promise<void>;
-}
+import { processDataEntry } from './processDataEntries';
 
 /**
  * Processes multiple data entries and returns results and errors
@@ -71,4 +65,4 @@ export async function processMultipleEntries(
   }
 
   return { results, errors };
-} 
+}

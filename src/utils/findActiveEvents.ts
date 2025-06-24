@@ -6,7 +6,7 @@ import type { CategoryIndexes, DataInternal } from '../types';
 export function findActiveEvents(
   currentMatchingIndexes: CategoryIndexes,
   dataInternal: { [key: string]: DataInternal[] },
-  currentTime: number
+  absoluteTimestampMs: number
 ): CategoryIndexes {
   const activeMatchingIndexes: CategoryIndexes = {};
 
@@ -21,13 +21,13 @@ export function findActiveEvents(
       if (item.end_timestamp) {
         // For events with end time, check if current time is within the range
         const itemEndTime = item.end_timestamp.getTime();
-        if (currentTime >= itemStartTime && currentTime <= itemEndTime && itemStartTime > mostRecentTime) {
+        if (absoluteTimestampMs >= itemStartTime && absoluteTimestampMs <= itemEndTime && itemStartTime > mostRecentTime) {
           mostRecentIndex = index;
           mostRecentTime = itemStartTime;
         }
       } else {
         // For events without end time, check if it's the most recent event
-        if (currentTime >= itemStartTime && itemStartTime > mostRecentTime) {
+        if (absoluteTimestampMs >= itemStartTime && itemStartTime > mostRecentTime) {
           mostRecentIndex = index;
           mostRecentTime = itemStartTime;
         }

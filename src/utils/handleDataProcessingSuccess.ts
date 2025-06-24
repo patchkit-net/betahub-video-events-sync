@@ -1,15 +1,6 @@
-import type { Data, Response } from '../types';
+import type { Data, DataProcessingSuccessOptions, ProcessingResult, Response } from '../types';
 
-import type { ProcessingResult } from './handleDataProcessingErrors';
-import { createSuccessResponse } from './errorHandler';
-
-export interface SuccessHandlingOptions {
-  onProgress?: (status: {
-    status: 'loading' | 'error' | 'success';
-    progress: number;
-  }) => void;
-  onSuccess?: (data: { [key: string]: Data[] }) => void;
-}
+import { createResponse } from './errorHandler';
 
 /**
  * Handles successful data processing and creates appropriate success responses
@@ -17,7 +8,7 @@ export interface SuccessHandlingOptions {
 export function handleDataProcessingSuccess(
   results: ProcessingResult[],
   data: { [key: string]: Data[] },
-  options?: SuccessHandlingOptions
+  options?: DataProcessingSuccessOptions
 ): Response<ProcessingResult[]> {
   if (options?.onProgress) {
     options.onProgress({
@@ -26,11 +17,9 @@ export function handleDataProcessingSuccess(
     });
   }
 
-  const successResponse = createSuccessResponse<ProcessingResult[]>(
-    results,
-    `Successfully processed ${results.length} entries`
-  );
+  const successResponse = createResponse<ProcessingResult[]>('success', 'Operation completed successfully', results);
 
   options?.onSuccess?.(data);
+
   return successResponse;
 } 

@@ -105,9 +105,9 @@ export class BHVESInstance {
       this.startTimestampParsed,
       videoPlayerTimeSeconds
     );
-    const currentTime =
+    const absoluteTimestampMs =
       this.startTimestampParsed.getTime() + videoPlayerTimeMilliseconds;
-    const currentTimeDate = new Date(currentTime);
+    const currentTimeDate = new Date(absoluteTimestampMs);
 
     // Get all events that should be displayed at current time
     const matchingIndexes = this.dataStore.findMatchingIndexes(currentTimeDate);
@@ -116,7 +116,7 @@ export class BHVESInstance {
     const activeMatchingIndexes = findActiveEvents(
       matchingIndexes,
       this.dataStore.getDataInternal(),
-      currentTime
+      absoluteTimestampMs
     );
 
     const state: State = {

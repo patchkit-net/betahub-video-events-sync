@@ -1,24 +1,6 @@
-import type { Data } from '../types';
+import type { Data, ProcessDataEntryOptions, ProcessDataEntryResult } from '../types';
+
 import { validateDataJSONL } from './validateDataJSONL';
-
-export interface ProcessDataEntryResult {
-  success: boolean;
-  data?: Data[];
-  itemCount?: number;
-  error?: {
-    message: string;
-    details?: Record<string, unknown>;
-  };
-}
-
-export interface ProcessDataEntryOptions {
-  onProgress?: (status: {
-    status: 'loading' | 'error' | 'success';
-    progress: number;
-  }) => void;
-  totalItems: number;
-  totalProgress: number;
-}
 
 /**
  * Processes a single data entry with validation and parsing
@@ -57,7 +39,7 @@ export async function processDataEntry(
 
   try {
     const validationResponse = validateDataJSONL(dataJSONL);
-    if (!validationResponse.success) {
+    if (validationResponse.status !== 'success') {
       return {
         success: false,
         error: {

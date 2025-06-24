@@ -1,10 +1,8 @@
 // Error-related types
 export type {
   ErrorType,
-  ErrorDetails,
   ErrorContext,
   ErrorInfo,
-  BHVLError,
   Response,
 } from './errors';
 
@@ -13,6 +11,12 @@ export type {
   Data,
   DataInternal,
   CategoryIndexes,
+  ProcessingError,
+  ProcessingResult,
+  ProcessDataEntryResult,
+  ProcessDataEntryOptions,
+  ProcessMultipleEntriesOptions,
+  StorageFunction,
 } from './data';
 
 // State-related types
@@ -24,6 +28,8 @@ export type {
 export type {
   OnStateUpdateCallback,
   OnTimeUpdateCallback,
+  DataProcessingErrorOptions,
+  DataProcessingSuccessOptions,
 } from './callbacks';
 
 // Constructor-related types

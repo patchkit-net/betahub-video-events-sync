@@ -1,9 +1,5 @@
 export type ErrorType = 'ValidationError' | 'DataProcessingError' | 'ConfigurationError' | 'UnknownError';
 
-export interface ErrorDetails {
-  [key: string]: unknown;
-}
-
 export interface ErrorContext {
   operation: string;
   component: string;
@@ -18,16 +14,6 @@ export interface ErrorInfo {
   originalError?: Error;
 }
 
-export interface BHVLError {
-  type: ErrorType;
-  code: string;
-  message: string;
-  details?: ErrorDetails;
-  originalError?: Error;
-  timestamp: string;
-}
-
-// Standardized response type for all API responses
 export interface Response<T = void> {
   status: 'success' | 'error';
   message: string;

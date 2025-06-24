@@ -1,19 +1,15 @@
-import type { ErrorContext, ErrorDetails, ErrorInfo, ErrorType, Response } from '../types';
+import type { ErrorContext, ErrorInfo, ErrorType, Response } from '../types';
 
 /**
  * Creates a standardized error with proper context and logging
  */
-export function createStandardError(
-  errorInfo: ErrorInfo,
-  details?: ErrorDetails
-): Error {
+export function createStandardError(errorInfo: ErrorInfo): Error {
   const error = new Error(errorInfo.message);
   
   // Add custom properties for better error handling
   (error as any).type = errorInfo.type;
   (error as any).context = errorInfo.context;
   (error as any).originalError = errorInfo.originalError;
-  (error as any).details = details;
   (error as any).timestamp = new Date().toISOString();
 
   // Log error for debugging (in development)
@@ -23,7 +19,6 @@ export function createStandardError(
       message: errorInfo.message,
       context: errorInfo.context,
       originalError: errorInfo.originalError?.message,
-      details,
       stack: errorInfo.originalError?.stack,
     });
   }
@@ -47,62 +42,6 @@ export function createResponse<T>(
     details,
     timestamp: new Date().toISOString(),
   };
-}
-
-/**
- * Creates a success response
- */
-export function createSuccessResponse<T>(data?: T, message: string = 'Operation completed successfully'): Response<T> {
-  return createResponse('success', message, data);
-}
-
-/**
- * Creates an error response
- */
-export function createErrorResponse<T>(
-  message: string,
-  details?: Record<string, unknown>,
-  data?: T
-): Response<T> {
-  return createResponse('error', message, data, details);
-}
-
-/**
- * Wraps an operation with error handling and context
- */
-export function withErrorHandling<T>(
-  operation: () => T | Promise<T>,
-  context: Omit<ErrorContext, 'timestamp'>,
-  errorType: ErrorType = 'UnknownError'
-): T | Promise<T> {
-  const errorContext: ErrorContext = {
-    ...context,
-    timestamp: new Date().toISOString(),
-  };
-
-  try {
-    const result = operation();
-    
-    if (result instanceof Promise) {
-      return result.catch((error) => {
-        throw createStandardError({
-          type: errorType,
-          message: `Failed to ${context.operation} in ${context.component}: ${error.message}`,
-          context: errorContext,
-          originalError: error instanceof Error ? error : new Error(String(error)),
-        });
-      });
-    }
-    
-    return result;
-  } catch (error) {
-    throw createStandardError({
-      type: errorType,
-      message: `Failed to ${context.operation} in ${context.component}: ${error instanceof Error ? error.message : String(error)}`,
-      context: errorContext,
-      originalError: error instanceof Error ? error : new Error(String(error)),
-    });
-  }
 }
 
 /**

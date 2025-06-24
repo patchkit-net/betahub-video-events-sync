@@ -1,26 +1,6 @@
-import type { Response } from '../types';
-import { createErrorResponse } from './errorHandler';
+import type { DataProcessingErrorOptions, ProcessingError, ProcessingResult, Response } from '../types';
 
-export interface ProcessingError {
-  name: string;
-  message: string;
-  details?: Record<string, unknown>;
-}
-
-export interface ProcessingResult {
-  name: string;
-  itemCount: number;
-}
-
-export interface ErrorHandlingOptions {
-  onError?: (error: {
-    message: string;
-    details?: {
-      successfulEntries?: ProcessingResult[];
-      failedEntries?: ProcessingError[];
-    };
-  }) => void;
-}
+import { createResponse } from './errorHandler';
 
 /**
  * Handles data processing errors and creates appropriate error responses
@@ -28,9 +8,9 @@ export interface ErrorHandlingOptions {
 export function handleDataProcessingErrors(
   results: ProcessingResult[],
   errors: ProcessingError[],
-  options?: ErrorHandlingOptions
+  options?: DataProcessingErrorOptions
 ): Response<ProcessingResult[]> {
-  const errorResponse = createErrorResponse<ProcessingResult[]>('Some entries failed to process', {
+  const errorResponse = createResponse<ProcessingResult[]>('error', 'Some entries failed to process', undefined, {
     successfulEntries: results,
     failedEntries: errors,
   });
