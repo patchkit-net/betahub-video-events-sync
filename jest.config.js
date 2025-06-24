@@ -11,6 +11,7 @@ const config = {
       useESM: true,
     }],
   },
+  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
 };
 
 export default config; 
