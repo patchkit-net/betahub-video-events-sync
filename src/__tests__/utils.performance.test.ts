@@ -1,10 +1,8 @@
-import { generateIntervalData, generateTestData, generateTimeIndexData } from '../utils/testUtils';
+import { convertToInternalData, convertVideoTimeToISOTimestamp } from '../utils';
+import { generateTestData, generateTimeIndexData } from '../testUtils';
 
 import { DataIndexManager } from '../DataIndexManager';
-// import { IntervalTree } from '../utils/IntervalTree'; // Removed - file doesn't exist
-import { convertVideoTimeToISOTimestamp } from '../utils/convertVideoTimeToISOTimestamp';
-// import { filterDataByTimestamp } from '../utils/filterDataByTimestamp'; // Removed - file doesn't exist
-import { getMatchingData } from '../utils/getMatchingData';
+import { getMatchingData } from '../publicUtils/getMatchingData';
 import { performance } from 'perf_hooks';
 
 // Reduced data sizes to prevent memory issues
@@ -54,9 +52,10 @@ describe('Performance Tests', () => {
         const manager = new DataIndexManager();
         const category = 'test';
         const data = generateTimeIndexData(size);
+        const internalData = convertToInternalData(data);
         
         const start = performance.now();
-        manager.addData(category, data);
+        manager.addData(category, internalData);
         const end = performance.now();
         const elapsed = end - start;
         
@@ -79,9 +78,10 @@ describe('Performance Tests', () => {
         const manager = new DataIndexManager();
         const category = 'test';
         const data = generateTimeIndexData(size);
+        const internalData = convertToInternalData(data);
         
         // Add data first
-        manager.addData(category, data);
+        manager.addData(category, internalData);
         
         // Measure timestamp finding
         const ts = new Date(Date.now() + 5000 * 1000).toISOString();
@@ -156,9 +156,10 @@ describe('Performance Tests', () => {
         const manager = new DataIndexManager();
         const category = 'test';
         const data = generateTimeIndexData(size);
+        const internalData = convertToInternalData(data);
         
         const addStart = performance.now();
-        manager.addData(category, data);
+        manager.addData(category, internalData);
         const addEnd = performance.now();
         const addElapsed = addEnd - addStart;
         
@@ -178,75 +179,6 @@ describe('Performance Tests', () => {
       });
     });
   });
-
-  // describe('filterDataByTimestamp', () => {
-  //   test('should filter data quickly across different scales', () => {
-  //     const results: { size: number; elapsedMs: number }[] = [];
-
-  //     DATA_SIZES.forEach(size => {
-  //       const { data } = generateTestData({ size });
-  //       const category = Object.keys(data)[0];
-        
-  //       // filterDataByTimestamp uses a singleton timeIndexManager, so we must add data first
-  //       const { timeIndexManager } = require('../addData');
-  //       timeIndexManager.addData(category, data[category]);
-        
-  //       const ts = new Date(Date.now() + 5000 * 1000).toISOString();
-  //       const start = performance.now();
-  //       filterDataByTimestamp(data, ts);
-  //       const end = performance.now();
-  //       const elapsed = end - start;
-  //       results.push({ size, elapsedMs: elapsed });
-  //     });
-
-  //     console.log('filterDataByTimestamp performance:', results);
-  //     results.forEach(result => {
-  //       expect(result.elapsedMs).toBeLessThan(100); // <100ms
-  //     });
-  //   });
-  // });
-
-  // describe('IntervalTree', () => {
-  //   test('insert, processBatch, and query performance across different scales', () => {
-  //     const results: { size: number; insertMs: number; batchMs: number; queryMs: number }[] = [];
-
-  //     DATA_SIZES.forEach(size => {
-  //       const tree = new IntervalTree();
-  //       const intervals = generateIntervalData(size);
-        
-  //       const insertStart = performance.now();
-  //       intervals.forEach(iv => tree.insert(iv.start, iv.end, iv.index));
-  //       const insertEnd = performance.now();
-  //       const insertElapsed = insertEnd - insertStart;
-        
-  //       tree.clear();
-  //       const batchStart = performance.now();
-  //       tree.processBatch(intervals);
-  //       const batchEnd = performance.now();
-  //       const batchElapsed = batchEnd - batchStart;
-        
-  //       const queryStart = performance.now();
-  //       tree.query(5000 * 1000);
-  //       const queryEnd = performance.now();
-  //       const queryElapsed = queryEnd - queryStart;
-        
-  //       results.push({
-  //         size,
-  //         insertMs: insertElapsed,
-  //         batchMs: batchElapsed,
-  //         queryMs: queryElapsed
-  //       });
-  //     });
-
-  //     console.log('IntervalTree performance:', results);
-  //     results.forEach(result => {
-  //       expect(result.insertMs).toBeLessThan(2000); // <2s for insert
-  //       expect(result.batchMs).toBeLessThan(2000); // <2s for batch
-  //       expect(result.queryMs).toBeLessThan(10); // <10ms for query
-  //     });
-  //   });
-  // });
-
   // Print performance summary after all tests
   afterAll(() => {
     const summary = [

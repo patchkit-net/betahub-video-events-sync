@@ -1,4 +1,4 @@
-import type { Data } from '../types';
+import type { Data } from './types';
 
 interface TestDataOptions {
   size: number;
