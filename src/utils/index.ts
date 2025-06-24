@@ -2,6 +2,7 @@ export { convertVideoTimeToISOTimestamp } from './convertVideoTimeToISOTimestamp
 export { convertToInternalData } from './convertToInternalData';
 export { findActiveEvents } from './findActiveEvents';
 export { processDataEntry, type ProcessDataEntryResult, type ProcessDataEntryOptions } from './processDataEntries';
+export { processMultipleEntries, type ProcessMultipleEntriesOptions, type StorageFunction } from './processMultipleEntries';
 export { countTotalItems } from './countTotalItems';
 export { validateDataJSONL } from './validateDataJSONL';
 export { parseTimestamp } from './parseTimestamp';
@@ -15,3 +16,4 @@ export {
   createSuccessResponse,
   createErrorResponse
 } from './errorHandler';
+export { DataStore } from '../DataStore';
