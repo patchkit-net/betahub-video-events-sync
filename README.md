@@ -126,7 +126,8 @@ The library provides several utility functions to help work with the data:
 import { 
   getMatchingData,
   getMovingWindowIndexes,
-  getShiftedIndexes 
+  getShiftedIndexes,
+  getSecondsFromTimestamp
 } from 'betahub-video-events-sync';
 
 // Convert index references to actual data objects
@@ -170,12 +171,26 @@ const shiftedIndexes = getShiftedIndexes(
 // Example:
 // Input: { logs: [5, 6] }, shift: -2
 // Output: { logs: [3, 4] }
+
+// Convert a timestamp to video time in seconds
+const videoTime = getSecondsFromTimestamp(
+  startTimestamp,  // The timestamp when the video starts
+  targetTimestamp  // The timestamp to convert to video time
+);
+// Returns: number (seconds from video start)
+// Example:
+// Input: startTimestamp: "2024-03-20T10:00:00Z", targetTimestamp: "2024-03-20T10:01:05Z"
+// Output: 65 (1 minute and 5 seconds)
+// Example:
+// Input: startTimestamp: new Date("2024-03-20T10:00:00Z"), targetTimestamp: "2024-03-20T10:00:30Z"
+// Output: 30 (30 seconds)
 ```
 
 Each utility function serves a specific purpose:
 - `getMatchingData`: Converts index references to actual data objects. Takes matching indexes and returns the corresponding data items for each category.
 - `getMovingWindowIndexes`: Creates a window of events around the current position. Useful for showing a consistent number of events before and after the current position, with a minimum total size.
 - `getShiftedIndexes`: Gets events shifted by a specific number of positions. Useful for navigation, allowing you to get the next N events or previous N events from the current position.
+- `getSecondsFromTimestamp`: Converts a timestamp to the corresponding video time in seconds. This is the reverse operation of the internal `convertVideoTimeToISOTimestamp` function. Useful for finding when a specific event should occur in the video timeline.
 
 ## Development Setup
 
