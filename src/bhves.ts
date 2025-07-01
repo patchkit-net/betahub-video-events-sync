@@ -193,5 +193,6 @@ export class BHVESInstance {
 export * from './publicUtils/getMatchingData';
 export * from './publicUtils/getMovingWindowIndexes';
 export * from './publicUtils/getShiftedIndexes';
+export * from './publicUtils/getSecondsFromTimestamp';
 export * from './types';
 
