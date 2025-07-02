@@ -1,4 +1,4 @@
-import { convertToInternalData, convertVideoTimeToISOTimestamp } from '../utils';
+import { convertToInternalData, convertVideoTimeToTimestamp } from '../utils';
 import { generateTestData, generateTimeIndexData } from '../testUtils';
 
 import { DataIndexManager } from '../DataIndexManager';
@@ -101,7 +101,7 @@ describe('Performance Tests', () => {
     });
   });
 
-  describe('convertTimeToISOTimestamp', () => {
+  describe('convertVideoTimeToTimestamp', () => {
     test('should convert times quickly across different scales', () => {
       const startTime = new Date();
       const results: { size: number; avgMs: number }[] = [];
@@ -109,14 +109,14 @@ describe('Performance Tests', () => {
       DATA_SIZES.forEach(size => {
         const start = performance.now();
         for (let i = 0; i < size; i++) {
-          convertVideoTimeToISOTimestamp(startTime, i);
+          convertVideoTimeToTimestamp(i, startTime);
         }
         const end = performance.now();
         const avg = (end - start) / size;
         results.push({ size, avgMs: avg });
       });
 
-      console.log('convertTimeToISOTimestamp performance:', results);
+      console.log('convertVideoTimeToTimestamp performance:', results);
       results.forEach(result => {
         expect(result.avgMs).toBeLessThan(0.01); // <0.01ms per call
       });

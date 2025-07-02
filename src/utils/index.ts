@@ -1,4 +1,4 @@
-export { convertVideoTimeToISOTimestamp } from './convertVideoTimeToISOTimestamp';
+export { convertVideoTimeToTimestamp } from './convertVideoTimeToTimestamp';
 export { convertToInternalData } from './convertToInternalData';
 export { findActiveEvents } from './findActiveEvents';
 export { processDataEntry } from './processDataEntries';

@@ -75,7 +75,7 @@ export class DataIndexManager {
 
       // Check all items that start before or at current time
       for (let i = 0; i < startIndex; i++) {
-        if (currentTime <= index.endTimes[i]) {
+        if (currentTime < index.endTimes[i]) {
           matchingIndexes.push(index.indexes[i]);
         }
       }

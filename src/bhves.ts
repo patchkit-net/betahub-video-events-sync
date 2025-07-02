@@ -9,7 +9,7 @@ import type {
   State,
 } from './types';
 import {
-  convertVideoTimeToISOTimestamp,
+  convertVideoTimeToTimestamp,
   countTotalItems,
   createStandardError,
   findActiveEvents,
@@ -102,13 +102,12 @@ export class BHVESInstance {
 
     const videoPlayerTimeSeconds = this.videoPlayer.currentTime;
     const videoPlayerTimeMilliseconds = videoPlayerTimeSeconds * 1000;
-    const timestamp = convertVideoTimeToISOTimestamp(
-      this.startTimestampParsed,
-      videoPlayerTimeSeconds
-    );
     const absoluteTimestampMs =
       this.startTimestampParsed.getTime() + videoPlayerTimeMilliseconds;
     const currentTimeDate = new Date(absoluteTimestampMs);
+    
+    // Create timestamp in local time to match the data format
+    const timestamp = convertVideoTimeToTimestamp(videoPlayerTimeSeconds, this.startTimestampParsed);
 
     // Get all events that should be displayed at current time
     const matchingIndexes = this.dataStore.findMatchingIndexes(currentTimeDate);
@@ -127,9 +126,8 @@ export class BHVESInstance {
       activeMatchingIndexes,
     };
 
-    if (Object.keys(state.matchingIndexes).length > 0) {
-      onStateUpdate?.({ state, data: this.dataStore.getData() });
-    }
+    // Always call onStateUpdate to allow clearing of events when no matches
+    onStateUpdate?.({ state, data: this.dataStore.getData() });
 
     onTimeUpdate?.({ videoPlayerTimeSeconds: this.videoPlayer.currentTime, timestamp });
   }
