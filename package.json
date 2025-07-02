@@ -1,6 +1,6 @@
 {
   "name": "betahub-video-events-sync",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "type": "module",
   "source": "src/bhves.ts",
   "main": "dist/bhves.js",
